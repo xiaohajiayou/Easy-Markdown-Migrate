@@ -1,29 +1,52 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { getImages, escapeStringRegexp, logger,rename,
     newName, getAutoPath, saveFile, getValidFileName,getMdPath} from './lib/common'
 import { analyze,showStatus  } from './analyze';
 import {openAndEditMarkdownFile} from './utils'
 
-export async function moveAll(lf: string) {
-    let localFolder = lf;
+export async function drop() {
 
-    let imageTargetFolder = path.join(localFolder, 'images');
-    // 检查目标文件夹是否存在
-    if (!fs.existsSync(imageTargetFolder)) {
-        // 目标文件夹不存在，尝试创建它
-        try {
-            fs.mkdirSync(imageTargetFolder, { recursive: true }); // 使用 recursive 选项以创建所有必需的父目录
-            console.log(`Created directory: ${imageTargetFolder}`);
-        } catch (error) {
-            // 创建目录时出错
-            console.error(`Failed to create directory: ${imageTargetFolder}`, error);
-            throw error; // 重新抛出错误，以便调用者可以处理
-        }
-    } else {
-        console.log(`Directory already exists: ${imageTargetFolder}`);
+
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return;
     }
+    // 获取 VSCode 窗口的根目录路径
+
+    // 获取工作区的根路径
+    let rootPath: string ;
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders) {
+        // 通常，我们取第一个工作区根路径作为当前文件所属的工作区
+        rootPath = workspaceFolders[0].uri.fsPath;
+        // 确保当前文件确实在工作区内
+        if (!mdFilePath.startsWith(rootPath)) {
+            return '';
+        }
+
+    }else {
+        return '';
+    }
+    
+
+    // 构建 .recycle 目录路径
+    const recycleImgPath = path.join(rootPath, '.recycle/images'); // 假设 .recycle 在扩展的根目录下
+
+    // 检查 .recycle 文件夹是否存在，不存在则创建
+    if (!fs.existsSync(recycleImgPath)) {
+        try {
+            fs.mkdirSync(recycleImgPath, { recursive: true });
+            console.log(`Created directory: ${recycleImgPath}`);
+        } catch (error) {
+            console.error(`Failed to create directory: ${recycleImgPath}`, error);
+            vscode.window.showErrorMessage(`Failed to create .recycle directory: ${error}`);
+            return;
+        }
+    }
+    const recycleBinPath = path.join(rootPath, '.recycle');
 
 
     let fileObj = getImages();
@@ -51,7 +74,7 @@ export async function moveAll(lf: string) {
             // 仅仅更换目录
             newFileName = imageFile.base;
         }
-        let newFile = await getValidFileName(imageTargetFolder, newFileName);
+        let newFile = await getValidFileName(recycleImgPath, newFileName);
         if (newFile == '') {
             logger.error(`get new image file name[${newFile}] fail!`);
             return '';
@@ -72,27 +95,18 @@ export async function moveAll(lf: string) {
     await saveFile(content,count);
 
 
-    // 移动md文件
-    // const activeTextEditor = vscode.window.activeTextEditor;
-    // if (activeTextEditor == null) { return; }
 
-
-    let mdFilePath = getMdPath();
-    // let mdFilePath = getMdPath();
-    if (!mdFilePath) {
-        vscode.window.showErrorMessage('No file path found for the active document.');
-        return;
-    }
+  
     // 构建目标文件路径
     const mdFileName = path.basename(mdFilePath);
-    const mdTargetFilePath = path.join(localFolder, mdFileName);
+    const mdTargetFilePath = path.join(recycleBinPath, mdFileName);
 
     try {
 
         // 移动文件
         fs.renameSync(mdFilePath, mdTargetFilePath);
         vscode.window.showInformationMessage(`Moved Markdown file to: ${mdTargetFilePath}`);
-        // vscode.commands.executeCommand('vscode.open', vscode.Uri.file(mdTargetFilePath));
+        vscode.commands.executeCommand('vscode.open', vscode.Uri.file(mdTargetFilePath));
 
         await openAndEditMarkdownFile(mdTargetFilePath);
         let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
@@ -108,4 +122,6 @@ export async function moveAll(lf: string) {
             vscode.window.showErrorMessage(`Failed to move the Markdown file: ${String(error)}`);
         }
     }
+
+
 }

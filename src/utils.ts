@@ -1,11 +1,14 @@
 import { mdCheck, showInVscode, setPara, timeoutPromise,clearMsg, logger,escapeStringRegexp } from './lib/common';
 
-import { move } from './lib/move';
+
 import { download } from './lib/download';
 import { getLang } from './lib/lang';
 
 import { analyze } from './analyze';
 import { moveAll } from './moveAll';
+import { drop } from './drop';
+import { moveImg } from './moveImg';  
+
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -56,7 +59,7 @@ export async function vscMove() {
 
     let localFolder: string = result[0].fsPath;
     console.log(`Will Move images to localFolder[${localFolder}]`)                            
-    await move(localFolder);
+    await moveImg(localFolder);
     showInVscode();
 }
 export async function vscTransfer() {
@@ -75,6 +78,12 @@ export async function vscTransfer() {
     console.log(`Will Move md_file&&images to localFolder[${localFolder}]`)
     
     await moveAll(localFolder);
+    showInVscode();
+}
+
+export async function vscDropFile() {
+
+    await drop();
     showInVscode();
 }
 
@@ -133,6 +142,7 @@ export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local:
     let retObj = { local: picArrLocal, net: picArrNet, invalid: picArrInvalid, mapping: oriMapping, content: str };
  
     let editContent = '';
+    logger.info(`currentEditor is [${docTextEditor?.document.uri.fsPath}]`);
     const currentEditor = docTextEditor;
     if (currentEditor == null) {
         logger.error(getLang('docAct'))
@@ -230,15 +240,6 @@ export async function openAndEditMarkdownFile(mdTargetFilePath: string): Promise
         const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(mdTargetFilePath));
         await vscode.window.showTextDocument(doc);
 
-        // 等待文件在编辑器中显示
-        // return new Promise<vscode.TextEditor | undefined>((resolve) => {
-        //     const subscription = vscode.window.onDidChangeActiveTextEditor((editor) => {
-        //         if (editor && editor.document.uri.fsPath === doc.uri.fsPath) {
-        //             resolve(editor);
-        //             subscription.dispose(); // 取消订阅
-        //         }
-        //     });
-        // });
     } catch (error) {
         vscode.window.showErrorMessage(`Error opening file: ${error}`);
         return undefined;

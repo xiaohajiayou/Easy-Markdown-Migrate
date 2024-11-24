@@ -7,8 +7,7 @@ import { getImages,escapeStringRegexp,logger,mdFile,rename,
 // let localFolder = ''; // 新的文件夹
 // let overwriteFile = false; // 是否覆盖原先的md文件
 // let rename = false; // 是否对所有的图片重新命名
-
-export async function move(lf:string) // ,thread:number
+export async function moveImg(lf:string) // ,thread:number
 {
     let localFolder = lf;
     let fileObj = getImages();
@@ -45,6 +44,7 @@ export async function move(lf:string) // ,thread:number
         }
         logger.info(`[${file}] move to [${newFile}], ${count}/${len}`,false);
         try{
+            // newFile = path.relative(oMdFile,newFile);
             fs.renameSync(file,newFile);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
             

@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import {vscAnalyze,initPara,vscClean,vscMove,vscDownload,vscTransfer}  from './utils';
+import {vscAnalyze,initPara,vscClean,vscMove,vscDownload,vscTransfer,vscDropFile}  from './utils';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -52,6 +52,10 @@ export function activate(context: vscode.ExtensionContext) {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscMove();
 	})
+	let dispDropFile = vscode.commands.registerCommand("markdown-image-transfer.drop", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscDropFile();
+	})
 
 
 	context.subscriptions.push(dispAnalyze);
@@ -60,6 +64,8 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(dispUpload);
 	context.subscriptions.push(dispMove);
 	context.subscriptions.push(dispMoveAll);
+	context.subscriptions.push(dispDropFile);
+
 }
 
 // this method is called when your extension is deactivated
