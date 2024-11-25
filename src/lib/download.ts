@@ -2,11 +2,12 @@ import * as path from 'path'
 import { window, ProgressLocation } from 'vscode'
 import downloadCore from "./downloadcore.js";
 import {
-    getImages, escapeStringRegexp, logger,
-    mdFile, localFolder, rename,
+    getImages, escapeStringRegexp,
+    localFolder, rename,
     getAutoPath, saveFile, localCheck, 
     timeoutPromise,dlTimeout
 } from './common'
+import { logger } from '../utils';
 import { getLang } from './lang.js';
 // 主要内部变量
 //var downThread = 1;

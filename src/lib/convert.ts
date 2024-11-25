@@ -1,9 +1,10 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import {
-    getImages, escapeStringRegexp, logger,
+    getImages, escapeStringRegexp,
     getAutoPath, saveFile, myEncodeURI,switchPath
 } from './common'
+import { logger } from '../utils';
 import { getLang } from './lang';
 
 export async function convert(formatFlag: boolean = true) // ,thread:number

@@ -4,10 +4,10 @@ import * as vscode from 'vscode';
 import { fromBuffer } from 'file-type';
 import * as fsExt from "fs-extra";
 import { getLang } from './lang';
+import { logger } from '../utils';
 let dayjs = require('dayjs');
 // import * as chalk from 'chalk' 可以不必用chalk 库
-export let mdFile = ''; // 需要处理的文件
-let oMdFile: path.ParsedPath; // mdFile的对象结构
+
 export let localFolder = ''; // 目标文件夹
 export let readonly = false; // 是否只读，默认修改内容
 export let skipSelectChange = false; // 是否只读，默认修改内容
@@ -19,6 +19,9 @@ export let dlTimeout = 10; // 下载超时
 export let ulTimeout = 10; // 上传超时
 export let clipboardPath = ''; // 剪切板图片默认路径
 export let urlFormatted = true; // URL格式神需要转义
+
+let mdFile = ''; // 需要处理的文件
+let oMdFile: path.ParsedPath; // mdFile的对象结构
 
 let docTextEditor: vscode.TextEditor | undefined; // 选择的MD文件
 let docPreSelection: vscode.Selection | undefined; // 选择的范围
@@ -138,124 +141,8 @@ export function escapeStringRegexp(string: string) {
         .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
         .replace(/-/g, '\\x2d');
 }
-// 常用控制台颜色清单
-const colorDict =
-{
-    'reset': '\x1B[0m', // 复位
-    'bright': '\x1B[1m', // 亮色
-    'grey': '\x1B[2m', // 灰色
-    'italic': '\x1B[3m', // 斜体
-    'underline': '\x1B[4m', // 下划线
-    'reverse': '\x1B[7m', // 反向
-    'hidden': '\x1B[8m', // 隐藏
-    'black': '\x1B[30m', // 黑色
-    'red': '\x1B[31m', // 红色
-    'green': '\x1B[32m', // 绿色
-    'yellow': '\x1B[33m', // 黄色
-    'blue': '\x1B[34m', // 蓝色
-    'magenta': '\x1B[35m', // 品红 // purple
-    'cyan': '\x1B[36m', // 青色
-    'white': '\x1B[37m', // 白色
-    'blackBG': '\x1B[40m', // 背景色为黑色
-    'redBG': '\x1B[41m', // 背景色为红色
-    'greenBG': '\x1B[42m', // 背景色为绿色
-    'yellowBG': '\x1B[43m', // 背景色为黄色
-    'blueBG': '\x1B[44m', // 背景色为蓝色
-    'magentaBG': '\x1B[45m', // 背景色为品红
-    'cyanBG': '\x1B[46m', // 背景色为青色
-    'whiteBG': '\x1B[47m' // 背景色为白色
-};
-// VSCode 输出控制台
-let out: vscode.OutputChannel = vscode.window.createOutputChannel("Mardown Image Manage");
-// 提示框同一时刻最多显示3个，所以短时间内多个相同输入，进行合并
-let msgHash = {
-    'warn': [] as string[],
-    'error': [] as string[],
-    'info': [] as string[],
-}
-export function clearMsg() {
-    msgHash.info = [];
-    msgHash.warn = [];
-    msgHash.error = [];
-    out.clear();
-    out.show();
-}
-export function showInVscode(modal: boolean = false) {
-    out.show();
-    if (msgHash.warn.length > 0) {
-        let msg = msgHash.warn.join('\n');
-        if (!modal) {
-            msg = msg.replace(/\n+/g, '|');
-        }
-        vscode.window.showWarningMessage(msg, { modal });
-    }
-    if (msgHash.error.length > 0) {
-        let msg = msgHash.error.join('\n');
-        if (!modal) {
-            msg = msg.replace(/\n+/g, '|');
-        }
-        vscode.window.showErrorMessage(msg, { modal });
-    }
-    if (msgHash.info.length > 0) {
-        let msg = msgHash.info.join('\n');
-        if (!modal) {
-            msg = msg.replace(/\n+/g, '|');
-        }
-        vscode.window.showInformationMessage(msg, { modal });
-    }
-}
-type MsgType = 'err' | 'warn' | 'info' | 'succ';
-export let logger = {
-    core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        // 核心模块显示
-        let color = '', hint = '', arr = [];
-        switch (msgType) {
-            case 'warn':
-                color = colorDict.yellow
-                hint = '[Warn]'
-                arr = msgHash.warn;
-                break;
-            case 'succ':
-                color = colorDict.green
-                arr = msgHash.info;
-                break;
-            case 'err':
-                color = colorDict.red
-                hint = '[Err]'
-                arr = msgHash.error;
-                break;
-            case 'info':
-                color = colorDict.cyan
-                arr = msgHash.info;
-                break;
-        }
-        console.log(color, msg, colorDict.reset);
-        out.appendLine(hint + msg);
-        if (popFlag) {
-            if (immediately) {
-                vscode.window.showWarningMessage(msg);
-            } else {
-                arr.push(msg.toString());
-            }
-        }
-    },
-    warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.yellow(...msg))
-        this.core('warn', msg, popFlag, immediately);
-    },
-    success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.green(...msg))
-        this.core('succ', msg, popFlag, immediately);
-    },
-    error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.red(...msg))
-        this.core('err', msg, popFlag, immediately);
-    },
-    info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.blue(...msg))
-        this.core('info', msg, popFlag, immediately);
-    }
-};
+
+
 // 设置相关内部变量
 export function setPara(bracket: string, ren: boolean, read: boolean, skip: boolean
     , local: string, remote: string, rem: string

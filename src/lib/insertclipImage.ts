@@ -2,21 +2,27 @@ import { getClipboardImage } from './getClipboardImage'
 import * as path from 'path'
 import * as fs from 'fs-extra'
 import {
-  insertText, logger, mdFile, clipboardPath,
+  insertText, getMdPath, clipboardPath,
   convertPath, getAutoPath, getValidFileName
 } from './common'
+import { logger } from '../utils';
 
 import { getLang } from './lang'
 // 主要内部变量
-// let mdFile = ''; // 需要处理的文件
-// let localFolder = ''; // 新的文件夹
-// let overwriteFile = false; // 是否覆盖原先的md文件
-// let rename = false; // 是否对所有的图片重新命名
+let mdFile:string |null = ''; // 需要处理的文件
+let localFolder = ''; // 新的文件夹
+let overwriteFile = false; // 是否覆盖原先的md文件
+let rename = false; // 是否对所有的图片重新命名
 
 export async function insertClipImage() // ,thread:number
 {
   // let localFolder = lf;
   // let fileObj = getImages(true); // 定位到选的内容
+  mdFile = await getMdPath();
+  if (!mdFile) {
+    // vscode.window.showErrorMessage(getLang('noMdFile'));
+    return;
+  }
   let parentPath = path.dirname(mdFile);
   // 目标保存
   let targetPath = path.resolve(parentPath, convertPath(clipboardPath.trim() || ''));

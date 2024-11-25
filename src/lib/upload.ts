@@ -3,10 +3,11 @@ import { window, ProgressLocation } from 'vscode'
 import * as vscode from 'vscode'
 import * as path from 'path';
 import {
-    getImages, escapeStringRegexp, logger, saveFile, remotePath,
+    getImages, escapeStringRegexp, saveFile, remotePath,
     rename, convertPath, insertText,
     timeoutPromise,ulTimeout
 } from './common';
+import { logger } from '../utils';
 import { getLang } from './lang';
 let {execSync,exec} = require('child_process');
 import {promisify} from 'util';

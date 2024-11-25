@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { getImages, logger, removeFolder, escapeStringRegexp, saveFile } from './common';
+import { getImages, removeFolder, escapeStringRegexp, saveFile } from './common';
 import { getLang } from './lang';
-
+import { logger } from '../utils';
 const extArr = ['.png', '.jpg', '.bmp', '.gif', '.jpeg', '.ico', '.tga', '.rle', '.tif', '.cur', '.ani', '.iff']; // 支持的图片格式
 
 

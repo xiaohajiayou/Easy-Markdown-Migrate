@@ -4,7 +4,8 @@ import * as http from "http";
 import * as path from "path";
 import { URL } from "url";
 import { Buffer } from 'buffer';
-import { logger, newName ,getValidFileName } from './common';
+import { newName ,getValidFileName } from './common';
+import { logger } from '../utils';
 // 伪装成浏览器
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const headers = { "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36" };

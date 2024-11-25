@@ -1,90 +1,282 @@
-import { mdCheck, showInVscode, setPara, timeoutPromise,clearMsg, logger,escapeStringRegexp } from './lib/common';
+import { rename,newName, getAutoPath, saveFile, getValidFileName,getMdPath,
+    getMdEditor,getImages,mdCheck,setPara, timeoutPromise,escapeStringRegexp, 
+    } from './lib/common';
 
 
 import { download } from './lib/download';
 import { getLang } from './lib/lang';
 
-import { analyze } from './analyze';
-import { moveAll } from './moveAll';
-import { drop } from './drop';
-import { moveImg } from './moveImg';  
 
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-/*
-import * as nls from 'vscode-nls';
-const localize = nls.config({
-    bundleFormat: nls.BundleFormat.standalone,
-    messageFormat: nls.MessageFormat.both
-})();
-//const localize = nls.loadMessageBundle();
-// 匹配对应的 i18n\zh-cn\xxx.i18n.json 文件
-// 打开新文件
-// let document = vscode.window.activeTextEditor?.document;
-// if(document != null)
-// {
-//     let pat = 'd:\\test.txt';
-//     let newUri = document.uri.with({ path: pat });
-//     await vscode.window.showTextDocument(newUri, { preview: false });
-// }
-*/
+
 
 let imagePathBracket = 'auto';
+let mdFileAfterRename = ''; // 需要处理的文件
+let oMdFileAfterRename: path.ParsedPath; // mdFile的对象结构
 
-export async function vscAnalyze() {
-    // vscode.window.showInformationMessage(getLang('hello'))
-    analyze();
-    showInVscode();
-}
-export async function vscClean(flag:boolean=false) {
-    // cleanMD(flag);
-    showInVscode();
-}
-export async function vscDownload() {
-    await download()
-    showInVscode();
-}
-export async function vscMove() {
-    const result = await vscode.window.showOpenDialog({
-        canSelectFiles: false,
-        canSelectFolders: true,
-        canSelectMany: false,
-        openLabel: getLang('moveHint')
-    });
+let docTextEditorAfterRename: vscode.TextEditor | undefined; // 选择的MD文件
+let docPreSelectionAfterRename: vscode.Selection | undefined; // 选择的范围
 
-    if (!result || result.length === 0) {
+// 常用控制台颜色清单
+const colorDict =
+{
+    'reset': '\x1B[0m', // 复位
+    'bright': '\x1B[1m', // 亮色
+    'grey': '\x1B[2m', // 灰色
+    'italic': '\x1B[3m', // 斜体
+    'underline': '\x1B[4m', // 下划线
+    'reverse': '\x1B[7m', // 反向
+    'hidden': '\x1B[8m', // 隐藏
+    'black': '\x1B[30m', // 黑色
+    'red': '\x1B[31m', // 红色
+    'green': '\x1B[32m', // 绿色
+    'yellow': '\x1B[33m', // 黄色
+    'blue': '\x1B[34m', // 蓝色
+    'magenta': '\x1B[35m', // 品红 // purple
+    'cyan': '\x1B[36m', // 青色
+    'white': '\x1B[37m', // 白色
+    'blackBG': '\x1B[40m', // 背景色为黑色
+    'redBG': '\x1B[41m', // 背景色为红色
+    'greenBG': '\x1B[42m', // 背景色为绿色
+    'yellowBG': '\x1B[43m', // 背景色为黄色
+    'blueBG': '\x1B[44m', // 背景色为蓝色
+    'magentaBG': '\x1B[45m', // 背景色为品红
+    'cyanBG': '\x1B[46m', // 背景色为青色
+    'whiteBG': '\x1B[47m' // 背景色为白色
+};
+// VSCode 输出控制台
+let out: vscode.OutputChannel = vscode.window.createOutputChannel("Mardown Image Manage");
+// 提示框同一时刻最多显示3个，所以短时间内多个相同输入，进行合并
+let msgHash = {
+    'warn': [] as string[],
+    'error': [] as string[],
+    'info': [] as string[],
+}
+export function clearMsg() {
+    msgHash.info = [];
+    msgHash.warn = [];
+    msgHash.error = [];
+    out.clear();
+    out.show();
+}
+
+export function analyze() {
+    try {
+        var obj = getImages();
+        if (obj.content == '') { return; }
+
+        logger.info(getLang('localimage', obj.local.length));
+        logger.info(`${obj.local.join('\n')}`);
+        logger.info(getLang('netimage', obj.net.length));
+        logger.info(`${obj.net.join('\n')}`);
+
+    } catch (e: any) {
+        logger.error(e.message);
+    }
+}
+
+
+
+export async function moveImg(lf:string) // ,thread:number
+{
+    let localFolder = lf;
+    let fileObj = getImages();
+    if(fileObj.content == '')
+    {
+        return '';
+    }
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set(); 
+    fileArr.forEach((item)=> set.add(item)); 
+    let uniArr:string[] = Array.from(set) as string[];
+    let count=0,len = uniArr.length;
+    for(let file of uniArr)
+    {
+        let newFileName = '';
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+        if(rename)
+        {
+            //文件重命名
+            newFileName = newName()+ imageFile.ext;
+        }else{
+            // 仅仅更换目录
+            newFileName = imageFile.base;
+        }
+        let newFile = await getValidFileName(localFolder,newFileName);
+        if( newFile == ''){
+            logger.error(`get new image file name[${newFile}] fail!`);
+            return '';
+        }
+        logger.info(`[${file}] move to [${newFile}], ${count}/${len}`,false);
+        try{
+            // newFile = path.relative(oMdFile,newFile);
+            fs.renameSync(file,newFile);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            
+            let a = getAutoPath( newFile) ;
+            content =  content.replace(reg,'![$1]('+ getAutoPath( newFile) +')'); // 内容替换
+            count++;
+        }catch(e)
+        {
+            logger.error('move error:');
+            console.log(e);
+        }
+    }
+    await saveFile(content,count);
+}
+
+
+export async function transferImg(imageTargetFolder:string) // ,thread:number
+{
+
+    let fileObj = getImages();
+    if (fileObj.content == '') {
+        return '';
+    }
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set();
+    fileArr.forEach((item) => set.add(item));
+    let uniArr: string[] = Array.from(set) as string[];
+    let count = 0, len = uniArr.length;
+    for (let file of uniArr) {
+        let newFileName = '';
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+        if (rename) {
+            // 文件重命名
+            newFileName = newName() + imageFile.ext;
+        } else {
+            // 仅仅更换目录
+            newFileName = imageFile.base;
+        }
+        let newFile = await getValidFileName(imageTargetFolder, newFileName);
+        if (newFile == '') {
+            logger.error(`get new image file name[${newFile}] fail!`);
+            return '';
+        }
+        logger.info(`[${file}] move to [${newFile}], ${count}/${len}`, false);
+        try{
+            fs.renameSync(file,newFile);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            let a = getAutoPath( newFile) ;
+            content =  content.replace(reg,'![$1]('+ 'images/'+ newFileName+')'); // 内容替换
+            count++;
+        }catch(e)
+        {
+            logger.error('move error:');
+            console.log(e);
+        }
+    }
+    await saveFile(content,count);
+}
+
+
+
+export async function transferFile(localFolder: string) {
+
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
         return;
     }
-
-    let localFolder: string = result[0].fsPath;
-    console.log(`Will Move images to localFolder[${localFolder}]`)                            
-    await moveImg(localFolder);
-    showInVscode();
-}
-export async function vscTransfer() {
-    const result = await vscode.window.showOpenDialog({
-        canSelectFiles: false,
-        canSelectFolders: true,
-        canSelectMany: false,
-        openLabel: getLang('moveHint')
-    });
-
-    if (!result || result.length === 0) {
-        return;
-    }
-
-    let localFolder: string = result[0].fsPath;
-    console.log(`Will Move md_file&&images to localFolder[${localFolder}]`)
+    // 构建目标文件路径
+    const mdFileName = path.basename(mdFilePath);
+    const mdTargetFilePath = path.join(localFolder, mdFileName);
     
-    await moveAll(localFolder);
-    showInVscode();
+
+    try {
+
+        // 移动文件
+        fs.renameSync(mdFilePath, mdTargetFilePath);
+        vscode.window.showInformationMessage(`Moved Markdown file to: ${mdTargetFilePath}`);
+
+        let currentEditor = getMdEditor(); // 获取初始活动文本编辑器
+        if(currentEditor == null) { return; }
+
+        // 如果当前活动编辑器是被移动的文件，则关闭它
+  
+        await vscode.window.showTextDocument(currentEditor.document, currentEditor.viewColumn)
+        
+        await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+    
+        // 打开新位置的文件
+        await   openAndEditMarkdownFile(mdTargetFilePath);
+                    
+        // 保存当前标签页
+        let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
+        if(docTextEditor == null) { return; }
+        await docTextEditor.document.save();
+
+        showStatus(docTextEditor);
+
+    } catch (error) {
+        // 类型保护
+        if (error instanceof Error) {
+            vscode.window.showErrorMessage(`Failed to move the Markdown file: ${error.message}`);
+        } else {
+            vscode.window.showErrorMessage(`Failed to move the Markdown file: ${String(error)}`);
+        }
+    }
 }
 
-export async function vscDropFile() {
 
-    await drop();
-    showInVscode();
+export async function drop(recycleBinPath:string) {
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return;
+    }
+    // 构建目标文件路径
+    const mdFileName = path.basename(mdFilePath);
+    const mdTargetFilePath = path.join(recycleBinPath, mdFileName);
+
+    try {
+
+        // 移动文件
+        fs.renameSync(mdFilePath, mdTargetFilePath);
+        let currentEditor = getMdEditor(); // 获取初始活动文本编辑器
+        if(currentEditor == null) { return; }
+
+        // 如果当前活动编辑器是被移动的文件，则关闭它
+  
+
+        await vscode.window.showTextDocument(currentEditor.document, currentEditor.viewColumn)
+        
+        await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+    
+        // 打开新位置的文件
+        await   openAndEditMarkdownFile(mdTargetFilePath);
+                    
+        // 保存当前标签页
+        let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
+        if(docTextEditor == null) { return; }
+        await docTextEditor.document.save();
+
+        showStatus(docTextEditor);
+
+
+    } catch (error) {
+        // 类型保护
+        if (error instanceof Error) {
+            vscode.window.showErrorMessage(`Failed to move the Markdown file: ${error.message}`);
+        } else {
+            vscode.window.showErrorMessage(`Failed to move the Markdown file: ${String(error)}`);
+        }
+    }
+
+
 }
 
 // 上传所选图片/剪切板图片
@@ -98,39 +290,107 @@ export async function vscDropFile() {
 // }
 // 插入剪切板图片
 
-
-
-
-// 初始化参数，参数保存于 common模块中
-export function initPara() {
-    clearMsg();
-    let extendName = 'markdown-image-transfer';
-    let hasBracket = vscode.workspace.getConfiguration(extendName).get('hasBracket') as string;
-    let updateLink = vscode.workspace.getConfiguration(extendName).get('updateLink') as boolean;
-    let skipSelectChange = vscode.workspace.getConfiguration(extendName).get('skipSelectChange') as boolean;
-    let rename = vscode.workspace.getConfiguration(extendName).get('rename') as boolean;
-    let remotePath: string = vscode.workspace.getConfiguration(extendName).get('remotePath') || '<filename>';
-    let imageSaveFolder: string = vscode.workspace.getConfiguration(extendName).get('imageSaveFolder') || '<filename>.assets';
-    let removeFolder: string = vscode.workspace.getConfiguration(extendName).get('removeFolder') || 'md-img-remove';
-    let dlTimeout: number = vscode.workspace.getConfiguration(extendName).get('timeoutDownload') || 10;
-    let ulTimeout: number = vscode.workspace.getConfiguration(extendName).get('timeoutUpload') || 10;
-    let clipboardPath: string = vscode.workspace.getConfiguration(extendName).get('clipboardPath') || '<filename>.assets/<YYMMDDHHmmss>.png';
-    let urlFormatted: boolean = vscode.workspace.getConfiguration(extendName).get('urlFormatted') || true;
-    if(dlTimeout<=0) {dlTimeout =10;}
-    if(ulTimeout<=0) {ulTimeout =10;}
-    //const isAsync: boolean = vscode.workspace.getConfiguration().get('downloadImageInMarkdown.isAsync') as boolean;
-    setPara(hasBracket, rename, updateLink,skipSelectChange, imageSaveFolder, remotePath
-        , removeFolder,dlTimeout,ulTimeout,clipboardPath,urlFormatted);
-
-    imagePathBracket = hasBracket; // 全局变量，用于判断是否需要带括号
-
-    let file = vscode.window.activeTextEditor?.document.uri.fsPath || '';
-    if (!mdCheck(file)) {
-        showInVscode();
-        return false;
-    }
-    return true;
+export async function vscClean(flag:boolean=false) {
+    // cleanMD(flag);
+    suspendedLogMsg();
 }
+export async function vscDownload() {
+    await download()
+    suspendedLogMsg();
+}
+
+export function suspendedLogMsg(modal: boolean = false) {
+    out.show();
+    if (msgHash.warn.length > 0) {
+        let msg = msgHash.warn.join('\n');
+        if (!modal) {
+            msg = msg.replace(/\n+/g, '|');
+        }
+        vscode.window.showWarningMessage(msg, { modal });
+    }
+    if (msgHash.error.length > 0) {
+        let msg = msgHash.error.join('\n');
+        if (!modal) {
+            msg = msg.replace(/\n+/g, '|');
+        }
+        vscode.window.showErrorMessage(msg, { modal });
+    }
+    if (msgHash.info.length > 0) {
+        let msg = msgHash.info.join('\n');
+        if (!modal) {
+            msg = msg.replace(/\n+/g, '|');
+        }
+        vscode.window.showInformationMessage(msg, { modal });
+    }
+}
+
+export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
+    try {
+        var obj = getStatus(docTextEditor);
+        if (obj.content == '') { return; }
+
+        logger.info(getLang('localimage', obj.local.length));
+        logger.info(`${obj.local.join('\n')}`);
+        logger.info(getLang('netimage', obj.net.length));
+        logger.info(`${obj.net.join('\n')}`);
+
+    } catch (e: any) {
+        logger.error(e.message);
+    }
+}
+
+type MsgType = 'err' | 'warn' | 'info' | 'succ';
+export let logger = {
+    core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        // 核心模块显示
+        let color = '', hint = '', arr = [];
+        switch (msgType) {
+            case 'warn':
+                color = colorDict.yellow
+                hint = '[Warn]'
+                arr = msgHash.warn;
+                break;
+            case 'succ':
+                color = colorDict.green
+                arr = msgHash.info;
+                break;
+            case 'err':
+                color = colorDict.red
+                hint = '[Err]'
+                arr = msgHash.error;
+                break;
+            case 'info':
+                color = colorDict.cyan
+                arr = msgHash.info;
+                break;
+        }
+        console.log(color, msg, colorDict.reset);
+        out.appendLine(hint + msg);
+        if (popFlag) {
+            if (immediately) {
+                vscode.window.showWarningMessage(msg);
+            } else {
+                arr.push(msg.toString());
+            }
+        }
+    },
+    warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.yellow(...msg))
+        this.core('warn', msg, popFlag, immediately);
+    },
+    success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.green(...msg))
+        this.core('succ', msg, popFlag, immediately);
+    },
+    error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.red(...msg))
+        this.core('err', msg, popFlag, immediately);
+    },
+    info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.blue(...msg))
+        this.core('info', msg, popFlag, immediately);
+    }
+};
 
 
 export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } {
@@ -233,6 +493,59 @@ export function findStatus(mdFile: string,reg: any, str: string, auto: boolean, 
     }
 }
 
+// type MsgType = 'err' | 'warn' | 'info' | 'succ';
+// export let logger = {
+//     core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
+//         // 核心模块显示
+//         let color = '', hint = '', arr = [];
+//         switch (msgType) {
+//             case 'warn':
+//                 color = colorDict.yellow
+//                 hint = '[Warn]'
+//                 arr = msgHash.warn;
+//                 break;
+//             case 'succ':
+//                 color = colorDict.green
+//                 arr = msgHash.info;
+//                 break;
+//             case 'err':
+//                 color = colorDict.red
+//                 hint = '[Err]'
+//                 arr = msgHash.error;
+//                 break;
+//             case 'info':
+//                 color = colorDict.cyan
+//                 arr = msgHash.info;
+//                 break;
+//         }
+//         console.log(color, msg, colorDict.reset);
+//         out.appendLine(hint + msg);
+//         if (popFlag) {
+//             if (immediately) {
+//                 vscode.window.showWarningMessage(msg);
+//             } else {
+//                 arr.push(msg.toString());
+//             }
+//         }
+//     },
+//     warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+//         //console.log( chalk.yellow(...msg))
+//         this.core('warn', msg, popFlag, immediately);
+//     },
+//     success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+//         //console.log( chalk.green(...msg))
+//         this.core('succ', msg, popFlag, immediately);
+//     },
+//     error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+//         //console.log( chalk.red(...msg))
+//         this.core('err', msg, popFlag, immediately);
+//     },
+//     info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+//         //console.log( chalk.blue(...msg))
+//         this.core('info', msg, popFlag, immediately);
+//     }
+// };
+
 
 export async function openAndEditMarkdownFile(mdTargetFilePath: string): Promise<vscode.TextEditor | undefined> {
     try {
@@ -246,4 +559,74 @@ export async function openAndEditMarkdownFile(mdTargetFilePath: string): Promise
     }
 }
 
+export function saveRenamedMsg(imageTargetFolder: string): boolean {
+    // md文件路径
+    if (!fs.existsSync(imageTargetFolder)) {
+        // 目标文件夹不存在，尝试创建它
+        try {
+            fs.mkdirSync(imageTargetFolder, { recursive: true }); // 使用 recursive 选项以创建所有必需的父目录
+            console.log(`Created directory: ${imageTargetFolder}`);
+        } catch (error) {
+            // 创建目录时出错
+            console.error(`Failed to create directory: ${imageTargetFolder}`, error);
+            throw error; // 重新抛出错误，以便调用者可以处理
+        }
+    } else {
+        console.log(`Directory already exists: ${imageTargetFolder}`);
+    }
+    mdFileAfterRename = imageTargetFolder; // 内部对象赋值，多个模块共用
+    oMdFileAfterRename = path.parse(mdFileAfterRename)
+    // docTextEditor_after_rename = vscode.window.activeTextEditor;
+    // docPreSelection_after_rename = docTextEditor_after_rename?.selection; // 光标位置
+    return true;
+}
+export function getOriginFileName(): string | undefined {
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return;
+    }
+    // 构建目标文件路径
+    const mdFileName = path.basename(mdFilePath);
+    return mdFileName;
+}
 
+export function getOriginMdPath(): string | undefined {
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return;
+    }
+    return mdFilePath;
+    
+}
+// 初始化参数，参数保存于 common模块中
+export function initPara() {
+    clearMsg();
+    let extendName = 'markdown-image-transfer';
+    let hasBracket = vscode.workspace.getConfiguration(extendName).get('hasBracket') as string;
+    let updateLink = vscode.workspace.getConfiguration(extendName).get('updateLink') as boolean;
+    let skipSelectChange = vscode.workspace.getConfiguration(extendName).get('skipSelectChange') as boolean;
+    let rename = vscode.workspace.getConfiguration(extendName).get('rename') as boolean;
+    let remotePath: string = vscode.workspace.getConfiguration(extendName).get('remotePath') || '<filename>';
+    let imageSaveFolder: string = vscode.workspace.getConfiguration(extendName).get('imageSaveFolder') || '<filename>.assets';
+    let removeFolder: string = vscode.workspace.getConfiguration(extendName).get('removeFolder') || 'md-img-remove';
+    let dlTimeout: number = vscode.workspace.getConfiguration(extendName).get('timeoutDownload') || 10;
+    let ulTimeout: number = vscode.workspace.getConfiguration(extendName).get('timeoutUpload') || 10;
+    let clipboardPath: string = vscode.workspace.getConfiguration(extendName).get('clipboardPath') || '<filename>.assets/<YYMMDDHHmmss>.png';
+    let urlFormatted: boolean = vscode.workspace.getConfiguration(extendName).get('urlFormatted') || true;
+    if(dlTimeout<=0) {dlTimeout =10;}
+    if(ulTimeout<=0) {ulTimeout =10;}
+    //const isAsync: boolean = vscode.workspace.getConfiguration().get('downloadImageInMarkdown.isAsync') as boolean;
+    setPara(hasBracket, rename, updateLink,skipSelectChange, imageSaveFolder, remotePath
+        , removeFolder,dlTimeout,ulTimeout,clipboardPath,urlFormatted);
+
+    imagePathBracket = hasBracket; // 全局变量，用于判断是否需要带括号
+
+    let file = vscode.window.activeTextEditor?.document.uri.fsPath || '';
+    if (!mdCheck(file)) {
+        suspendedLogMsg();
+        return false;
+    }
+    return true;
+}
