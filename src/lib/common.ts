@@ -275,7 +275,7 @@ function getAutoPathCore(dir: string, newfile: string) {
 
         let relativeFile = path.relative(dir, newfile);
         // 如果不是上级目录的文件
-        if (relativeFile.indexOf('..\\') == -1) {
+        if (relativeFile.indexOf('..\\') != -1) {
             newfile = relativeFile;
         }
         return newfile;

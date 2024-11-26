@@ -1,6 +1,6 @@
-import { rename,newName, getAutoPath, saveFile, getValidFileName,getMdPath,
-    getMdEditor,getImages,mdCheck,setPara, timeoutPromise,escapeStringRegexp, 
-    } from './lib/common';
+import { rename,newName, saveFile, getValidFileName,getMdPath,
+    getMdEditor,getImages,mdCheck,setPara,escapeStringRegexp, 
+    switchPath,urlFormatted,myEncodeURI} from './lib/common';
 
 
 import { download } from './lib/download';
@@ -18,7 +18,7 @@ let oMdFileAfterRename: path.ParsedPath; // mdFile的对象结构
 
 let docTextEditorAfterRename: vscode.TextEditor | undefined; // 选择的MD文件
 let docPreSelectionAfterRename: vscode.Selection | undefined; // 选择的范围
-
+let openAfterTransfer = false; // 是否打开文件
 // 常用控制台颜色清单
 const colorDict =
 {
@@ -66,12 +66,12 @@ export function analyze() {
     try {
         var obj = getImages();
         if (obj.content == '') { return; }
-
+        logger.info(`************************| Image Links analyse report Start|*******************\n`, false);
         logger.info(getLang('localimage', obj.local.length));
         logger.info(`${obj.local.join('\n')}`);
         logger.info(getLang('netimage', obj.net.length));
         logger.info(`${obj.net.join('\n')}`);
-
+        logger.info(`************************| Image Links analyse report End|*******************`, false);
     } catch (e: any) {
         logger.error(e.message);
     }
@@ -116,12 +116,11 @@ export async function moveImg(lf:string) // ,thread:number
         }
         logger.info(`[${file}] move to [${newFile}], ${count}/${len}`,false);
         try{
-            // newFile = path.relative(oMdFile,newFile);
+
             fs.renameSync(file,newFile);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
-            
-            let a = getAutoPath( newFile) ;
-            content =  content.replace(reg,'![$1]('+ getAutoPath( newFile) +')'); // 内容替换
+            //转为相对路径
+            content =  content.replace(reg,'![$1]('+ convertAbOrRelative( newFile) +')'); // 内容替换
             count++;
         }catch(e)
         {
@@ -170,7 +169,7 @@ export async function transferImg(imageTargetFolder:string) // ,thread:number
         try{
             fs.renameSync(file,newFile);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
-            let a = getAutoPath( newFile) ;
+            let a = convertAbOrRelative( newFile) ;
             content =  content.replace(reg,'![$1]('+ 'images/'+ newFileName+')'); // 内容替换
             count++;
         }catch(e)
@@ -220,6 +219,10 @@ export async function transferFile(localFolder: string) {
         await docTextEditor.document.save();
 
         showStatus(docTextEditor);
+        if(!openAfterTransfer) {
+            await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
+        }
+
 
     } catch (error) {
         // 类型保护
@@ -265,6 +268,9 @@ export async function drop(recycleBinPath:string) {
         await docTextEditor.document.save();
 
         showStatus(docTextEditor);
+        if(!openAfterTransfer) {
+            await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
+        }
 
 
     } catch (error) {
@@ -329,11 +335,12 @@ export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
         var obj = getStatus(docTextEditor);
         if (obj.content == '') { return; }
 
+        logger.info(`************************| Image Links analyse report Start|*******************\n`, false);
         logger.info(getLang('localimage', obj.local.length));
         logger.info(`${obj.local.join('\n')}`);
         logger.info(getLang('netimage', obj.net.length));
         logger.info(`${obj.net.join('\n')}`);
-
+        logger.info(`************************| Image Links analyse report End|*******************`, false);
     } catch (e: any) {
         logger.error(e.message);
     }
@@ -600,10 +607,18 @@ export function getOriginMdPath(): string | undefined {
     return mdFilePath;
     
 }
+// 转换为相对路径,第一个参数为相对路径，第二个为新的文件全路径
+export function convertAbOrRelative(originFile: string) {
+    // 默认以 md文件为默认路径
+    let newFile = switchPath(originFile,path.isAbsolute(originFile));
+    logger.info(`path[${originFile}] convert to [${newFile}]`, false);
+    return myEncodeURI(newFile, urlFormatted);
+}
 // 初始化参数，参数保存于 common模块中
 export function initPara() {
     clearMsg();
     let extendName = 'markdown-image-transfer';
+    let transferFlag = vscode.workspace.getConfiguration(extendName).get('openAfterTransfer') as boolean;
     let hasBracket = vscode.workspace.getConfiguration(extendName).get('hasBracket') as string;
     let updateLink = vscode.workspace.getConfiguration(extendName).get('updateLink') as boolean;
     let skipSelectChange = vscode.workspace.getConfiguration(extendName).get('skipSelectChange') as boolean;
@@ -620,9 +635,9 @@ export function initPara() {
     //const isAsync: boolean = vscode.workspace.getConfiguration().get('downloadImageInMarkdown.isAsync') as boolean;
     setPara(hasBracket, rename, updateLink,skipSelectChange, imageSaveFolder, remotePath
         , removeFolder,dlTimeout,ulTimeout,clipboardPath,urlFormatted);
-
+    
     imagePathBracket = hasBracket; // 全局变量，用于判断是否需要带括号
-
+    openAfterTransfer = transferFlag; // 全局变量，用于判断是否需要打开图片
     let file = vscode.window.activeTextEditor?.document.uri.fsPath || '';
     if (!mdCheck(file)) {
         suspendedLogMsg();

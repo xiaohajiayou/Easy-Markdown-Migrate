@@ -115,6 +115,11 @@
       "type": "object",
       "title": "Markdown Image Transfer",
       "properties": {
+        "markdown-image-transfer.openAfterTransfer": {
+          "type": "boolean",
+          "default": false,
+          "description": "%markdown-image-transfer.openAfterTransfer%"
+        },
         "markdown-image-transfer.removeFolder": {
           "type": "string",
           "default": "md-img-remove",
