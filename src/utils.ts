@@ -66,23 +66,140 @@ export function analyze() {
     try {
         var obj = getImages();
         if (obj.content == '') { return; }
-        logger.info(`************************| Image Links analyse report Start|*******************\n`, false);
-        logger.info(getLang('localimage', obj.local.length));
-        logger.info(`${obj.local.join('\n')}`);
-        logger.info(getLang('netimage', obj.net.length));
-        logger.info(`${obj.net.join('\n')}`);
-        logger.info(`************************| Image Links analyse report End|*******************`, false);
+        logger.info(`\n`, false);
+        logger.info(`+------------------------------------+`, false);
+        logger.info(`|    Image Links Analyse Report      |`, false);
+        logger.info(`+------------------------------------+`, false);
+        logger.info(`|       * Local Images: ${obj.local.length} *     `, false);
+        
+        obj.local.forEach(image => {
+            logger.info(`|  ${image}                                      `, false);
+        });
+        logger.info(`+-------------------------------------+`, false);
+        logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
+        
+        obj.net.forEach(image => {
+            logger.info(`|  ${image}                                      `, false);
+        });
+        logger.info(`+-------------------------------------+`, false);
+        logger.info(`\n`, false);
     } catch (e: any) {
         logger.error(e.message);
     }
 }
 
 
+export function suspendedLogMsg(modal: boolean = false) {
+    out.show();
+    if (msgHash.warn.length > 0) {
+        let msg = msgHash.warn.join('\n');
+        if (!modal) {
+            msg = msg.replace(/\n+/g, '|');
+        }
+        vscode.window.showWarningMessage(msg, { modal });
+    }
+    if (msgHash.error.length > 0) {
+        let msg = msgHash.error.join('\n');
+        if (!modal) {
+            msg = msg.replace(/\n+/g, '|');
+        }
+        vscode.window.showErrorMessage(msg, { modal });
+    }
+    if (msgHash.info.length > 0) {
+        let msg = msgHash.info.join('\n');
+        if (!modal) {
+            msg = msg.replace(/\n+/g, '|');
+        }
+        vscode.window.showInformationMessage(msg, { modal });
+    }
+}
 
-export async function moveImg(lf:string) // ,thread:number
+export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
+    try {
+        var obj = getStatus(docTextEditor);
+        if (obj.content == '') { return; }
+        logger.info(`\n`, false);
+        logger.info(`+------------------------------------+`, false);
+        logger.info(`|    Image Links Analyse Report      |`, false);
+        logger.info(`+------------------------------------+`, false);
+        logger.info(`|       * Local Images: ${obj.local.length} *     `, false);
+        
+        obj.local.forEach(image => {
+            logger.info(`|  ${image}                                      `, false);
+        });
+        logger.info(`+-------------------------------------+`, false);
+        logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
+        
+        obj.net.forEach(image => {
+            logger.info(`|  ${image}                                      `, false);
+        });
+        logger.info(`+-------------------------------------+`, false);
+        logger.info(`\n`, false);
+    } catch (e: any) {
+        logger.error(e.message);
+    }
+}
+
+type MsgType = 'err' | 'warn' | 'info' | 'succ';
+export let logger = {
+    core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        // 核心模块显示
+        let color = '', hint = '', arr = [];
+        switch (msgType) {
+            case 'warn':
+                color = colorDict.yellow
+                hint = '[Warn]'
+                arr = msgHash.warn;
+                break;
+            case 'succ':
+                color = colorDict.green
+                arr = msgHash.info;
+                break;
+            case 'err':
+                color = colorDict.red
+                hint = '[Err]'
+                arr = msgHash.error;
+                break;
+            case 'info':
+                color = colorDict.cyan
+                arr = msgHash.info;
+                break;
+        }
+        // console.log(msg);
+        // console.log(color, msg, colorDict.reset);
+        out.appendLine(hint + msg);
+        if (popFlag) {
+            if (immediately) {
+                vscode.window.showWarningMessage(msg);
+            } else {
+                arr.push(msg.toString());
+            }
+        }
+    },
+    warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.yellow(...msg))
+        this.core('warn', msg, popFlag, immediately);
+    },
+    success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.green(...msg))
+        this.core('succ', msg, popFlag, immediately);
+        this.core('succ', 'successfully.', true, immediately);
+        
+    },
+    error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.red(...msg))
+        this.core('err', msg, popFlag, immediately);
+    },
+    info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.blue(...msg))
+        this.core('info', msg, popFlag, immediately);
+    }
+};
+
+export async function moveImg(lf:string,selectFlag:boolean= true) // ,thread:number
 {
     let localFolder = lf;
-    let fileObj = getImages();
+    let fileObj = getImages(selectFlag);
     if(fileObj.content == '')
     {
         return '';
@@ -118,6 +235,7 @@ export async function moveImg(lf:string) // ,thread:number
         try{
 
             fs.renameSync(file,newFile);
+            let b = escapeStringRegexp(fileMapping[file]);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
             //转为相对路径
             content =  content.replace(reg,'![$1]('+ convertAbOrRelative( newFile) +')'); // 内容替换
@@ -128,14 +246,14 @@ export async function moveImg(lf:string) // ,thread:number
             console.log(e);
         }
     }
-    await saveFile(content,count);
+    await saveFile(content,count,selectFlag);
 }
 
 
-export async function transferImg(imageTargetFolder:string) // ,thread:number
+export async function transferImg(imageTargetFolder:string,selectFlag:boolean= false) // ,thread:number
 {
 
-    let fileObj = getImages();
+    let fileObj = getImages(selectFlag);
     if (fileObj.content == '') {
         return '';
     }
@@ -199,8 +317,7 @@ export async function transferFile(localFolder: string) {
 
         // 移动文件
         fs.renameSync(mdFilePath, mdTargetFilePath);
-        vscode.window.showInformationMessage(`Moved Markdown file to: ${mdTargetFilePath}`);
-
+        logger.info(`Moved Markdown file to: [${mdTargetFilePath}]`,false);
         let currentEditor = getMdEditor(); // 获取初始活动文本编辑器
         if(currentEditor == null) { return; }
 
@@ -296,108 +413,78 @@ export async function drop(recycleBinPath:string) {
 // }
 // 插入剪切板图片
 
-export async function vscClean(flag:boolean=false) {
-    // cleanMD(flag);
-    suspendedLogMsg();
+function cleanInvalidLinks() {
+    try {
+        var obj = getImages();
+        if (obj.content == '') { return; }
+        // 循环替换失效的链接
+        let content = obj.content;
+        let count = 0;
+        for (let file of obj.invalid) {
+            logger.info(`clean link [${file}]`, false);
+            var reg = new RegExp('!\\[([^\\]]*)\\]\\(' + escapeStringRegexp(file) + '\\)', 'ig');
+            content = content.replace(reg, ''); // 内容替换
+            count++;
+        }
+        saveFile(content, count);
+    } catch (e: any) {
+        logger.error(e.message);
+    }
+}
+export async function cleanSelectedLinks(imageTargetFolder:string,selectFlag:boolean= true) {
+    let cleanFlag = true;
+    let fileObj = getImages(selectFlag); // 获取图片信息
+    if (fileObj.content == '') {
+        return '';
+    }
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set();
+    fileArr.forEach((item) => set.add(item));
+    let uniArr: string[] = Array.from(set) as string[];
+    let count = 0, len = uniArr.length;
+    for (let file of uniArr) {
+        let newFileName = '';
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+        // if (rename) {
+        //     // 文件重命名
+        //     newFileName = newName() + imageFile.ext;
+        // } else {
+            // 仅仅更换目录
+            newFileName = imageFile.base;
+        // }
+        let newFile = await getValidFileName(imageTargetFolder, newFileName);
+        if (newFile == '') {
+            logger.error(`get new image file name[${newFile}] fail!`);
+            return '';
+        }
+        logger.info(`[${file}] move to [${newFile}], ${count}/${len}`, false);
+        try{
+            fs.renameSync(file,newFile);
+            let b = escapeStringRegexp(fileMapping[file]);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            let a = convertAbOrRelative( newFile) ;
+            content =  content.replace(reg,''); // 清空内容
+            count++;
+        }catch(e)
+        {
+            logger.error('clean error:');
+            console.log(e);
+        }
+    }
+    await saveFile(content,count,selectFlag,cleanFlag);
+
 }
 export async function vscDownload() {
     await download()
     suspendedLogMsg();
 }
 
-export function suspendedLogMsg(modal: boolean = false) {
-    out.show();
-    if (msgHash.warn.length > 0) {
-        let msg = msgHash.warn.join('\n');
-        if (!modal) {
-            msg = msg.replace(/\n+/g, '|');
-        }
-        vscode.window.showWarningMessage(msg, { modal });
-    }
-    if (msgHash.error.length > 0) {
-        let msg = msgHash.error.join('\n');
-        if (!modal) {
-            msg = msg.replace(/\n+/g, '|');
-        }
-        vscode.window.showErrorMessage(msg, { modal });
-    }
-    if (msgHash.info.length > 0) {
-        let msg = msgHash.info.join('\n');
-        if (!modal) {
-            msg = msg.replace(/\n+/g, '|');
-        }
-        vscode.window.showInformationMessage(msg, { modal });
-    }
-}
-
-export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
-    try {
-        var obj = getStatus(docTextEditor);
-        if (obj.content == '') { return; }
-
-        logger.info(`************************| Image Links analyse report Start|*******************\n`, false);
-        logger.info(getLang('localimage', obj.local.length));
-        logger.info(`${obj.local.join('\n')}`);
-        logger.info(getLang('netimage', obj.net.length));
-        logger.info(`${obj.net.join('\n')}`);
-        logger.info(`************************| Image Links analyse report End|*******************`, false);
-    } catch (e: any) {
-        logger.error(e.message);
-    }
-}
-
-type MsgType = 'err' | 'warn' | 'info' | 'succ';
-export let logger = {
-    core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        // 核心模块显示
-        let color = '', hint = '', arr = [];
-        switch (msgType) {
-            case 'warn':
-                color = colorDict.yellow
-                hint = '[Warn]'
-                arr = msgHash.warn;
-                break;
-            case 'succ':
-                color = colorDict.green
-                arr = msgHash.info;
-                break;
-            case 'err':
-                color = colorDict.red
-                hint = '[Err]'
-                arr = msgHash.error;
-                break;
-            case 'info':
-                color = colorDict.cyan
-                arr = msgHash.info;
-                break;
-        }
-        console.log(color, msg, colorDict.reset);
-        out.appendLine(hint + msg);
-        if (popFlag) {
-            if (immediately) {
-                vscode.window.showWarningMessage(msg);
-            } else {
-                arr.push(msg.toString());
-            }
-        }
-    },
-    warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.yellow(...msg))
-        this.core('warn', msg, popFlag, immediately);
-    },
-    success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.green(...msg))
-        this.core('succ', msg, popFlag, immediately);
-    },
-    error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.red(...msg))
-        this.core('err', msg, popFlag, immediately);
-    },
-    info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.blue(...msg))
-        this.core('info', msg, popFlag, immediately);
-    }
-};
 
 
 export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } {
@@ -409,7 +496,7 @@ export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local:
     let retObj = { local: picArrLocal, net: picArrNet, invalid: picArrInvalid, mapping: oriMapping, content: str };
  
     let editContent = '';
-    logger.info(`currentEditor is [${docTextEditor?.document.uri.fsPath}]`);
+    logger.info(`currentEditor is [${docTextEditor?.document.uri.fsPath}]`,false);
     const currentEditor = docTextEditor;
     if (currentEditor == null) {
         logger.error(getLang('docAct'))

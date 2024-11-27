@@ -33,6 +33,7 @@ export async function download() // ,thread:number
     var p = new Promise((resolve,reject) => {
         rres = resolve;
     });
+    logger.warn('Downloading images. Stay on this page.',true,true);
     window.withProgress({ title: getLang('dling'), location: ProgressLocation.Notification }, async (progress, token) => {
         for (let file of downArr) {
             count++;

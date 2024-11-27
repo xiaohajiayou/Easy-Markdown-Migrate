@@ -6,8 +6,8 @@
 
     "markdown-image-transfer.menuDownload": "Download Images",
     "markdown-image-transfer.menuUpload": "Upload Select Images",
-    "markdown-image-transfer.menuMoveLocalImage": "Move Images Only",
-    "markdown-image-transfer.menuClean": "Delete Select Image ",
+    "markdown-image-transfer.menuMoveLocalImage": " Move  Select Images",
+    "markdown-image-transfer.menuClean": "Delete Select Images ",
     "markdown-image-transfer.menuDrop": "Drop File to Trash",
 
 
@@ -24,4 +24,4 @@
     "markdown-image-transfer.uploadTimeout": "Timeout seconds for upload each image",
     "markdown-image-transfer.clipboardPath": "Clipboard image's path and name, support <filename> and date format<YYYYMMDD> variable (dayjs)"
     ,"markdown-image-transfer.urlFormatted": "Whether escape image URL when insert local image"
-}
+} 

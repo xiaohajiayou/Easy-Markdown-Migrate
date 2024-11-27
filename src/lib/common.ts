@@ -47,6 +47,7 @@ export function getImages(selectFlag: boolean = false): { local: string[], net: 
         editContent = currentEditor.document.getText(r);
         if (r == null || editContent == '') {
             // 没有选中任何内容
+            logger.warn("No Image Url selected. Please select a URL before proceeding.");
             return retObj;
         }
     } else {
@@ -360,7 +361,7 @@ export async function insertText(content: string) {
     logger.success(getLang('insertTxt'))
 }
 // 保存内容
-export async function saveFile(content: string, count: number, selectFlag: boolean = false) {
+export async function saveFile(content: string, count: number, selectFlag: boolean = false,cleanFlag: boolean = false) {
     if (count == 0) {
         logger.warn(getLang('uptSucc3'));
         return;
@@ -371,7 +372,7 @@ export async function saveFile(content: string, count: number, selectFlag: boole
     }
     let textEditor = await checkEditor(false)
     if (textEditor == null) { return; }
-    if (content.length > 0 && textEditor != null) {
+    if ((content.length > 0||cleanFlag) && textEditor != null) {
         await textEditor.edit((editBuilder: vscode.TextEditorEdit) => {
             let rang: vscode.Range;
             if (selectFlag) {
@@ -391,7 +392,7 @@ export async function saveFile(content: string, count: number, selectFlag: boole
         await textEditor.document.save();
     }
 
-    logger.success(getLang('uptSucc', count, path.basename(mdFile)));
+    logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
 }
 // 获取本地有效的文件名
 export async function getValidFileName(dest: string, filename: string, content?: Buffer): Promise<string> {
