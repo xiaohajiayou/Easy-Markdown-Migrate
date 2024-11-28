@@ -7,6 +7,8 @@ import {vscDropFile} from './drop';
 import {vscTransfer} from './transfer';
 import {vscMove} from './moveImg';
 import {vscDeleteImgs} from './deleteImg';
+import { vscPaste } from './copyPaste';
+import { vscCrop } from './copyPaste';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -39,6 +41,14 @@ export function activate(context: vscode.ExtensionContext) {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscTransfer();
 	})
+	let dispCrop = vscode.commands.registerCommand("markdown-image-transfer.crop", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscCrop();
+	})
+	let dispPaste = vscode.commands.registerCommand("markdown-image-transfer.paste", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscPaste();
+	})
 	let dispClean = vscode.commands.registerCommand("markdown-image-transfer.clean", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscDeleteImgs();
@@ -64,11 +74,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(dispAnalyze);
-	context.subscriptions.push(dispClean);
+	context.subscriptions.push(dispMoveAll);
+	context.subscriptions.push(dispCrop);
+	context.subscriptions.push(dispPaste);
+
 	context.subscriptions.push(dispDownload);
 	context.subscriptions.push(dispUpload);
+
+	context.subscriptions.push(dispClean);
 	context.subscriptions.push(dispMove);
-	context.subscriptions.push(dispMoveAll);
 	context.subscriptions.push(dispDropFile);
 
 }

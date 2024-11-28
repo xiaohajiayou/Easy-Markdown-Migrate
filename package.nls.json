@@ -3,6 +3,8 @@
 
     "markdown-image-transfer.menuAnalyze": "Analyze Image Links",
     "markdown-image-transfer.menuTransfer": "Transfer Markdown File",
+    "markdown-image-transfer.menuCrop": "Crop Select content",
+    "markdown-image-transfer.menuPaste": "paste Select Content",
 
     "markdown-image-transfer.menuDownload": "Download Images",
     "markdown-image-transfer.menuUpload": "Upload Select Images",

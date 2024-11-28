@@ -13,11 +13,15 @@
   ],
   "activationEvents": [
     "onCommand:markdown-image-transfer.analyze",
-    "onCommand:markdown-image-transfer.clean",
+    "onCommand:markdown-image-transfer.transfer",
+    "onCommand:markdown-image-transfer.copy",
+    "onCommand:markdown-image-transfer.paste",
+
     "onCommand:markdown-image-transfer.download",
     "onCommand:markdown-image-transfer.upload",
+
+    "onCommand:markdown-image-transfer.clean",
     "onCommand:markdown-image-transfer.moveLocalImage",
-    "onCommand:markdown-image-transfer.transfer",
     "onCommand:markdown-image-transfer.drop",
     "onLanguage:markdown"
   ],
@@ -43,6 +47,14 @@
         "title": "%markdown-image-transfer.menuTransfer%"
       },
       {
+        "command": "markdown-image-transfer.crop",
+        "title": "%markdown-image-transfer.menuCrop%"
+      },
+      {
+        "command": "markdown-image-transfer.paste",
+        "title": "%markdown-image-transfer.menuPaste%"
+      },
+      {
         "command": "markdown-image-transfer.download",
         "title": "%markdown-image-transfer.menuDownload%"
       },
@@ -63,6 +75,7 @@
         "command": "markdown-image-transfer.drop",
         "title": "%markdown-image-transfer.menuDrop%"
       }
+
     ],
     "menus": {
       "editor/context": [
@@ -76,38 +89,49 @@
       "markdown-image-transfer.menulist": [
         {
           "command": "markdown-image-transfer.analyze",
-          "group": "1_workspace"
+          "group": "1_workspace@1"
         },
 
         {
           "command": "markdown-image-transfer.transfer",
-          "group": "1_workspace"
+          "group": "1_workspace@2"
+        },
+        {
+          "command": "markdown-image-transfer.crop",
+          "group": "2_workspace@1"
+        },
+        {
+          "command": "markdown-image-transfer.paste",
+          "group": "2_workspace@2"
         },
 
 
 
         {
           "command": "markdown-image-transfer.download",
-          "group": "2_workspace"
+          "group": "3_workspace@1"
         },
         {
           "command": "markdown-image-transfer.upload",
-          "group": "2_workspace"
+          "group": "3_workspace@2"
+        },
+
+
+
+        {
+          "command": "markdown-image-transfer.moveLocalImage",
+          "group": "4_workspace@1"
         },
 
         {
           "command": "markdown-image-transfer.clean",
-          "group": "3_workspace@1"
-        },
-
-        {
-          "command": "markdown-image-transfer.moveLocalImage",
-          "group": "3_workspace@2"
+          "group": "5_workspace@1"
         },
         {
           "command": "markdown-image-transfer.drop",
-          "group": "3_workspace@3"
+          "group": "5_workspace@2"
         }
+
 
       ]
     },

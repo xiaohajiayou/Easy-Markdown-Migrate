@@ -19,6 +19,7 @@ let oMdFileAfterRename: path.ParsedPath; // mdFile的对象结构
 let docTextEditorAfterRename: vscode.TextEditor | undefined; // 选择的MD文件
 let docPreSelectionAfterRename: vscode.Selection | undefined; // 选择的范围
 let openAfterTransfer = false; // 是否打开文件
+let savedFileObj:{ local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } |undefined ;
 // 常用控制台颜色清单
 const colorDict =
 {
@@ -53,6 +54,102 @@ let msgHash = {
     'warn': [] as string[],
     'error': [] as string[],
     'info': [] as string[],
+}
+
+export async function cropContent(selectFlag:boolean= true) {
+    let fileObj = getImages(selectFlag);
+    if(fileObj.content == '')
+        {
+            logger.error('No image cut, cannot paste.');
+            return '';
+        }
+    savedFileObj = fileObj;
+    
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set(); 
+    fileArr.forEach((item)=> set.add(item)); 
+    let uniArr:string[] = Array.from(set) as string[];
+    let count=0,len = uniArr.length;
+    for(let file of uniArr)
+    {
+
+        logger.info(`Image cropped : [${file}] ], ${count+1}/${len}`,false);
+        try{
+
+            // fs.renameSync(file,newFile);
+            let b = escapeStringRegexp(fileMapping[file]);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            //转为相对路径
+            content =  content.replace(reg,''); // 内容替换
+            count++;
+        }catch(e)
+        {
+            logger.error('move error:');
+            console.log(e);
+        }
+    }
+    await saveFile(content,count,selectFlag);
+}
+export async function pasteContent(selectFlag:boolean= true) {
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return;
+    }
+    let mdFileFolder = path.dirname(mdFilePath);
+    let imageTargetFolder = path.join(mdFileFolder, 'images');
+    if(savedFileObj == undefined){
+        logger.error('No image crop, cannot paste.');
+        return '';
+    }
+    let fileObj = savedFileObj;
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set(); 
+    fileArr.forEach((item)=> set.add(item)); 
+    let uniArr:string[] = Array.from(set) as string[];
+    let count=0,len = uniArr.length;
+    for(let file of uniArr)
+    {
+        let newFileName = '';
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+        if(rename)
+        {
+            //文件重命名
+            newFileName = newName()+ imageFile.ext;
+        }else{
+            // 仅仅更换目录
+            newFileName = imageFile.base;
+        }
+        let newFile = await getValidFileName(imageTargetFolder,newFileName);
+        if( newFile == ''){
+            logger.error(`get new image file name[${newFile}] fail!`);
+            return '';
+        }
+        logger.info(`[${file}] move to [${newFile}], ${count+1}/${len}`,false);
+        try{
+
+            fs.renameSync(file,newFile);
+            let b = escapeStringRegexp(fileMapping[file]);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            //转为相对路径
+            content =  content.replace(reg,'![$1]('+ convertAbOrRelative( newFile) +')'); // 内容替换
+            count++;
+        }catch(e)
+        {
+            logger.error('move error:');
+            console.log(e);
+        }
+    }
+    await saveFile(content,count,selectFlag);
 }
 export function clearMsg() {
     msgHash.info = [];
@@ -231,7 +328,7 @@ export async function moveImg(lf:string,selectFlag:boolean= true) // ,thread:num
             logger.error(`get new image file name[${newFile}] fail!`);
             return '';
         }
-        logger.info(`[${file}] move to [${newFile}], ${count}/${len}`,false);
+        logger.info(`[${file}] move to [${newFile}], ${count+1}/${len}`,false);
         try{
 
             fs.renameSync(file,newFile);
@@ -283,7 +380,7 @@ export async function transferImg(imageTargetFolder:string,selectFlag:boolean= f
             logger.error(`get new image file name[${newFile}] fail!`);
             return '';
         }
-        logger.info(`[${file}] move to [${newFile}], ${count}/${len}`, false);
+        logger.info(`[${file}] move to [${newFile}], ${count+1}/${len}`, false);
         try{
             fs.renameSync(file,newFile);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
@@ -463,7 +560,7 @@ export async function cleanSelectedLinks(imageTargetFolder:string,selectFlag:boo
             logger.error(`get new image file name[${newFile}] fail!`);
             return '';
         }
-        logger.info(`[${file}] move to [${newFile}], ${count}/${len}`, false);
+        logger.info(`[${file}] move to [${newFile}], ${count+1}/${len}`, false);
         try{
             fs.renameSync(file,newFile);
             let b = escapeStringRegexp(fileMapping[file]);
