@@ -15,6 +15,7 @@ export async function vscCrop() {
 
 export async function vscPaste() {
     await pasteContent(true);
+    analyze();
     suspendedLogMsg();
 }
 

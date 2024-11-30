@@ -93,6 +93,7 @@ export async function cropContent(selectFlag:boolean= true) {
         }
     }
     await saveFile(content,count,selectFlag);
+    logger.success('Crop successfully.', true, true);
 }
 export async function pasteContent(selectFlag:boolean= true) {
     let mdFilePath = getMdPath();
@@ -150,6 +151,7 @@ export async function pasteContent(selectFlag:boolean= true) {
         }
     }
     await saveFile(content,count,selectFlag);
+    // logger.success('Paste successfully.', true, true);
 }
 export function clearMsg() {
     msgHash.info = [];
@@ -172,13 +174,27 @@ export function analyze() {
         obj.local.forEach(image => {
             logger.info(`|  ${image}                                      `, false);
         });
-        logger.info(`+-------------------------------------+`, false);
+        logger.info(`+------------------------------------+`, false);
         logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
         
         obj.net.forEach(image => {
             logger.info(`|  ${image}                                      `, false);
         });
-        logger.info(`+-------------------------------------+`, false);
+        logger.info(`+------------------------------------+`, false);
+
+        if(obj.invalid.length == 0) {
+            logger.info(`|           successfully             |`, false);
+            logger.info(`+------------------------------------+`, false);
+        }else {
+            logger.info(`|       * Invalid Images: ${obj.invalid.length} *     `, false);
+            obj.invalid.forEach(image => {
+                logger.info(`|  ${image}                                      `, false);
+            });
+            logger.info(`+------------------------------------+`, false);
+            logger.info(`|               Erro                 |`, false);
+            logger.info(`+------------------------------------+`, false);
+            logger.info(`| Warning: Invalid image detected. Please check.|`, false);
+        }
         logger.info(`\n`, false);
     } catch (e: any) {
         logger.error(e.message);
@@ -224,13 +240,27 @@ export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
         obj.local.forEach(image => {
             logger.info(`|  ${image}                                      `, false);
         });
-        logger.info(`+-------------------------------------+`, false);
+        logger.info(`+------------------------------------+`, false);
         logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
         
         obj.net.forEach(image => {
             logger.info(`|  ${image}                                      `, false);
         });
-        logger.info(`+-------------------------------------+`, false);
+        logger.info(`+------------------------------------+`, false);
+
+        if(obj.invalid.length == 0) {
+            logger.info(`|           successfully             |`, false);
+            logger.info(`+------------------------------------+`, false);
+        }else {
+            logger.info(`|       * Invalid Images: ${obj.invalid.length} *     `, false);
+            obj.invalid.forEach(image => {
+                logger.info(`|  ${image}                                      `, false);
+            });
+            logger.info(`+------------------------------------+`, false);
+            logger.info(`|               Erro                 |`, false);
+            logger.info(`+------------------------------------+`, false);
+            logger.info(`| Warning: Invalid image detected. Please check.|`, false);
+        }
         logger.info(`\n`, false);
     } catch (e: any) {
         logger.error(e.message);
@@ -280,7 +310,6 @@ export let logger = {
     success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
         //console.log( chalk.green(...msg))
         this.core('succ', msg, popFlag, immediately);
-        this.core('succ', 'successfully.', true, immediately);
         
     },
     error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
@@ -485,6 +514,7 @@ export async function drop(recycleBinPath:string) {
         if(!openAfterTransfer) {
             await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
         }
+        logger.success('Drop successfully.', true, true);
 
 
     } catch (error) {
@@ -575,6 +605,7 @@ export async function cleanSelectedLinks(imageTargetFolder:string,selectFlag:boo
         }
     }
     await saveFile(content,count,selectFlag,cleanFlag);
+    logger.success('Delete successfully.', true, true);
 
 }
 export async function vscDownload() {
@@ -797,6 +828,41 @@ export function convertAbOrRelative(originFile: string) {
     let newFile = switchPath(originFile,path.isAbsolute(originFile));
     logger.info(`path[${originFile}] convert to [${newFile}]`, false);
     return myEncodeURI(newFile, urlFormatted);
+}
+export async function convertSelectUrl(selectFlag:boolean= true){
+    let fileObj = getImages(selectFlag);
+    if(fileObj.content == '')
+    {
+        return '';
+    }
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set(); 
+    fileArr.forEach((item)=> set.add(item)); 
+    let uniArr:string[] = Array.from(set) as string[];
+    let count=0,len = uniArr.length;
+    for(let file of uniArr)
+        {
+            // 转移到目标路径 
+            let imageFile = path.parse(file);
+            logger.info(`[${file}] move to [${imageFile}], ${count+1}/${len}`,false);
+            try{
+    
+                let b = escapeStringRegexp(fileMapping[file]);
+                var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+                //转为相对路径
+                content =  content.replace(reg,'![$1]('+ convertAbOrRelative(fileMapping[file]) +')'); // 内容替换
+                count++;
+            }catch(e)
+            {
+                logger.error('convert error:');
+                console.log(e);
+            }
+        }
+        await saveFile(content,count,selectFlag);
 }
 // 初始化参数，参数保存于 common模块中
 export function initPara() {

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
 import { getLang } from './lib/lang';
-import { suspendedLogMsg,moveImg } from './utils';
+import { suspendedLogMsg,moveImg ,analyze} from './utils';
 // 主要内部变量
 // let mdFile = ''; // 需要处理的文件
 // let localFolder = ''; // 新的文件夹
@@ -24,5 +24,6 @@ export async function vscMove() {
     let localFolder: string = result[0].fsPath;
     console.log(`Will Move images to localFolder[${localFolder}]`)                            
     await moveImg(localFolder,true);
+    analyze();
     suspendedLogMsg();
 }

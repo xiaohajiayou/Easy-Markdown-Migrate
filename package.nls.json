@@ -9,6 +9,9 @@
     "markdown-image-transfer.menuDownload": "Download Images",
     "markdown-image-transfer.menuUpload": "Upload Select Images",
     "markdown-image-transfer.menuMoveLocalImage": " Move  Select Images",
+    "markdown-image-transfer.menuConvert": " Absolute<->Relative",
+
+
     "markdown-image-transfer.menuClean": "Delete Select Images ",
     "markdown-image-transfer.menuDrop": "Drop File to Trash",
 

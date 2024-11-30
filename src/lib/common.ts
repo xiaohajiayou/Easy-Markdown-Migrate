@@ -392,7 +392,7 @@ export async function saveFile(content: string, count: number, selectFlag: boole
         await textEditor.document.save();
     }
 
-    logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
+    // logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
 }
 // 获取本地有效的文件名
 export async function getValidFileName(dest: string, filename: string, content?: Buffer): Promise<string> {

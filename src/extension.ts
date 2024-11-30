@@ -7,8 +7,8 @@ import {vscDropFile} from './drop';
 import {vscTransfer} from './transfer';
 import {vscMove} from './moveImg';
 import {vscDeleteImgs} from './deleteImg';
-import { vscPaste } from './copyPaste';
-import { vscCrop } from './copyPaste';
+import { vscPaste,vscCrop  } from './copyPaste';
+import { vscConvertUrl } from './convertUrl';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -49,10 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscPaste();
 	})
-	let dispClean = vscode.commands.registerCommand("markdown-image-transfer.clean", async () => {
-		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
-		vscDeleteImgs();
-	})
+
 
 	let dispDownload = vscode.commands.registerCommand("markdown-image-transfer.download", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
@@ -66,6 +63,16 @@ export function activate(context: vscode.ExtensionContext) {
 	let dispMove = vscode.commands.registerCommand("markdown-image-transfer.moveLocalImage", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscMove();
+	})
+	let dispConvert = vscode.commands.registerCommand("markdown-image-transfer.convert", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscConvertUrl();
+	})
+
+
+	let dispClean = vscode.commands.registerCommand("markdown-image-transfer.clean", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscDeleteImgs();
 	})
 	let dispDropFile = vscode.commands.registerCommand("markdown-image-transfer.drop", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
@@ -81,8 +88,10 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(dispDownload);
 	context.subscriptions.push(dispUpload);
 
-	context.subscriptions.push(dispClean);
 	context.subscriptions.push(dispMove);
+	context.subscriptions.push(dispConvert);
+
+	context.subscriptions.push(dispClean);
 	context.subscriptions.push(dispDropFile);
 
 }

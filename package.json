@@ -14,14 +14,17 @@
   "activationEvents": [
     "onCommand:markdown-image-transfer.analyze",
     "onCommand:markdown-image-transfer.transfer",
+
     "onCommand:markdown-image-transfer.copy",
     "onCommand:markdown-image-transfer.paste",
 
     "onCommand:markdown-image-transfer.download",
     "onCommand:markdown-image-transfer.upload",
 
-    "onCommand:markdown-image-transfer.clean",
     "onCommand:markdown-image-transfer.moveLocalImage",
+    "onCommand:markdown-image-transfer.convert",
+
+    "onCommand:markdown-image-transfer.clean",
     "onCommand:markdown-image-transfer.drop",
     "onLanguage:markdown"
   ],
@@ -67,6 +70,11 @@
         "command": "markdown-image-transfer.moveLocalImage",
         "title": "%markdown-image-transfer.menuMoveLocalImage%"
       },
+      {
+        "command": "markdown-image-transfer.convert",
+        "title": "%markdown-image-transfer.menuConvert%"
+      },
+
       {
         "command": "markdown-image-transfer.clean",
         "title": "%markdown-image-transfer.menuClean%"
@@ -122,6 +130,11 @@
           "command": "markdown-image-transfer.moveLocalImage",
           "group": "4_workspace@1"
         },
+        {
+          "command": "markdown-image-transfer.convert",
+          "group": "4_workspace@2"
+        },
+
 
         {
           "command": "markdown-image-transfer.clean",
