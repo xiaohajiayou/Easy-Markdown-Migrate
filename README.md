@@ -18,7 +18,7 @@ markdown-image-TransferTool
 
 如何使用
 ---------------
-打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](images/image.png)
+打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/test/m45wih2m.png)
 
   具体功能适用场景如下：  
 - 分析当前文件的图片链接:  `Analyze Image Links`  
