@@ -72,6 +72,7 @@ let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会�
 
 
 export async function cropContent(selectFlag:boolean= true) {
+    let cleanFlag = true;
     let fileObj = getImages(selectFlag);
     if(fileObj.content == '')
         {
@@ -107,8 +108,8 @@ export async function cropContent(selectFlag:boolean= true) {
             console.log(e);
         }
     }
-    await saveFile(content,count,selectFlag);
-    logger.success('Crop successfully.', true, true);
+    await saveFile(content,count,selectFlag,cleanFlag);
+    logger.success('Crop successfully.', true);
 }
 export async function pasteContent(selectFlag:boolean= true) {
     let mdFilePath = getMdPath();
@@ -529,7 +530,7 @@ export async function drop(recycleBinPath:string) {
         if(!openAfterTransfer) {
             await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
         }
-        logger.success('Drop successfully.', true, true);
+        logger.success('Drop successfully.', true);
 
 
     } catch (error) {
@@ -620,7 +621,7 @@ export async function cleanSelectedLinks(imageTargetFolder:string,selectFlag:boo
         }
     }
     await saveFile(content,count,selectFlag,cleanFlag);
-    logger.success('Delete successfully.', true, true);
+    logger.success('Delete successfully.', true);
 
 }
 export async function vscDownload() {
