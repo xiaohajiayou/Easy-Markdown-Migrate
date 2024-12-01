@@ -9,85 +9,27 @@ import {
 } from './common';
 import { logger } from '../utils';
 import { getLang } from './lang';
-let {execSync,exec} = require('child_process');
-import {promisify} from 'util';
-import  * as fs from 'fs';
+
 // 主要内部变量
 //var downThread = 1;
 let myPicgo: any = null; // picgo对象
 let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会自动增加文件夹以将不同md文件的图片分离开
 
-let myExec = promisify(exec);
-async function installPicgo() {
-    //logger.info('check picgo installation...')
-    //console.log(__dirname)
-    // console.log(__filename)
-    let runPath = path.resolve(__dirname +'/../'); // 上一级目录
-    console.log(runPath)
-    try {
-        execSync('picgo -v', { cwd: runPath });  // 尝试执行 PicGo命令
-    } catch (e) {
-        logger.error(getLang('installPicgo'));
-        return 'error';
-    }
-    let rres: any;
-    var p = new Promise((resolve, reject) => {
-        rres = resolve;
-    });
-    let answer = await window.showInformationMessage(getLang('link'), "YES", "NO")
-    if (answer === "YES") {
-        window.withProgress({ title: 'linking picgo...', location: ProgressLocation.Notification }, async (progress, token) => {
-            let count =0;
-            setInterval(function(){
-                count ++;
-                progress.report({ increment: count%100, message: "..." });
-            },100)
-            try{
-                // 先改名 package.json
-                fs.renameSync(runPath + '/package.json',runPath + '/ori-package.json');
-                // copy package.json
-                fs.copyFileSync(runPath + '/package-linkpicgo.json', runPath + '/package.json')
-                await myExec('npm link picgo', { cwd: runPath });  // 通过命令进行关联 npm link picgo --omit dev ping 127.0.0.1 -n 7
-            }catch(e)
-            {
-                rres('error')
-                logger.error(e as any);
-            }finally{
-                // 原来配置文件还原
-                fs.unlinkSync(runPath + '/package.json');
-                fs.renameSync(runPath + '/ori-package.json',runPath + '/package.json');
-            }
-            rres('ok')
-            return Promise.resolve();
-        }).then(()=>{});
-    } else {
-        rres('error')
-    }
-    return p;
-}
-/** Prompts user to reload editor window in order for configuration change to take effect. */
-function promptToReloadWindow(msg:string) {
-const action1 = getLang('picgotryNow');
-const action2 = getLang('picgotryLater');
-window.showWarningMessage(msg,action1,action2)
-    .then(selectedAction => {
-    if (selectedAction === action1) {
-        vscode.commands.executeCommand('workbench.action.reloadWindow');
-    }
-    });
-}
+
 export async function upCheck() {
     try {
         const { PicGo } = require('picgo');
         myPicgo = PicGo;
     } catch (e) {
-        let res = await installPicgo()
-        if( res == 'ok')
-        {
-            promptToReloadWindow(getLang('picgotry'))
-        }else{
-            logger.error(getLang('picgofail'))
-        }
+        // let res = await installPicgo()
+        // if( res == 'ok')
+        // {
+        //     promptToReloadWindow(getLang('picgotry'))
+        // }else{
+        //     logger.error(getLang('picgofail'))
+        // }
+        logger.error('PicGo init error:');
+        console.log(e);
         return false;
     }
     // 需要处理的文件

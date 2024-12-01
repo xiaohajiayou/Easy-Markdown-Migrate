@@ -14,16 +14,12 @@
   "activationEvents": [
     "onCommand:markdown-image-transfer.analyze",
     "onCommand:markdown-image-transfer.transfer",
-
     "onCommand:markdown-image-transfer.copy",
     "onCommand:markdown-image-transfer.paste",
-
     "onCommand:markdown-image-transfer.download",
     "onCommand:markdown-image-transfer.upload",
-
     "onCommand:markdown-image-transfer.moveLocalImage",
     "onCommand:markdown-image-transfer.convert",
-
     "onCommand:markdown-image-transfer.clean",
     "onCommand:markdown-image-transfer.drop",
     "onLanguage:markdown"
@@ -40,7 +36,6 @@
       }
     ],
     "commands": [
-
       {
         "command": "markdown-image-transfer.analyze",
         "title": "%markdown-image-transfer.menuAnalyze%"
@@ -65,7 +60,6 @@
         "command": "markdown-image-transfer.upload",
         "title": "%markdown-image-transfer.menuUpload%"
       },
-
       {
         "command": "markdown-image-transfer.moveLocalImage",
         "title": "%markdown-image-transfer.menuMoveLocalImage%"
@@ -74,7 +68,6 @@
         "command": "markdown-image-transfer.convert",
         "title": "%markdown-image-transfer.menuConvert%"
       },
-
       {
         "command": "markdown-image-transfer.clean",
         "title": "%markdown-image-transfer.menuClean%"
@@ -83,7 +76,6 @@
         "command": "markdown-image-transfer.drop",
         "title": "%markdown-image-transfer.menuDrop%"
       }
-
     ],
     "menus": {
       "editor/context": [
@@ -93,13 +85,11 @@
           "group": "navigation"
         }
       ],
-
       "markdown-image-transfer.menulist": [
         {
           "command": "markdown-image-transfer.analyze",
           "group": "1_workspace@1"
         },
-
         {
           "command": "markdown-image-transfer.transfer",
           "group": "1_workspace@2"
@@ -112,19 +102,14 @@
           "command": "markdown-image-transfer.paste",
           "group": "2_workspace@2"
         },
-
-
-
         {
-          "command": "markdown-image-transfer.download",
+          "command": "markdown-image-transfer.upload",
           "group": "3_workspace@1"
         },
         {
-          "command": "markdown-image-transfer.upload",
+          "command": "markdown-image-transfer.download",
           "group": "3_workspace@2"
         },
-
-
 
         {
           "command": "markdown-image-transfer.moveLocalImage",
@@ -134,8 +119,6 @@
           "command": "markdown-image-transfer.convert",
           "group": "4_workspace@2"
         },
-
-
         {
           "command": "markdown-image-transfer.clean",
           "group": "5_workspace@1"
@@ -144,8 +127,6 @@
           "command": "markdown-image-transfer.drop",
           "group": "5_workspace@2"
         }
-
-
       ]
     },
     "configuration": {
@@ -259,6 +240,7 @@
     "del": "^6.0.0",
     "esbuild": "^0.15.1",
     "eslint": "^8.11.0",
+    "file-type": "^16.5.3",
     "fs-extra": "^10.0.1",
     "glob": "^7.2.0",
     "gulp": "^4.0.2",
@@ -267,9 +249,9 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "is-wsl": "^2.2.0",
     "mocha": "^9.2.2",
+    "picgo": "^1.5.8",
     "typescript": "^4.5.5",
     "vscode-nls": "^5.0.0",
-    "vscode-nls-dev": "^4.0.0",
-    "file-type": "^16.5.3"
+    "vscode-nls-dev": "^4.0.0"
   }
 }

@@ -9,6 +9,7 @@ import {vscMove} from './moveImg';
 import {vscDeleteImgs} from './deleteImg';
 import { vscPaste,vscCrop  } from './copyPaste';
 import { vscConvertUrl } from './convertUrl';
+import { vscUpload } from './uploadImgs';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -57,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 	})
 	let dispUpload = vscode.commands.registerCommand("markdown-image-transfer.upload", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
-		// vscUpload();
+		vscUpload();
 	})
 
 	let dispMove = vscode.commands.registerCommand("markdown-image-transfer.moveLocalImage", async () => {

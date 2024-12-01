@@ -293,7 +293,7 @@ export function switchPath(strPath:string,relativeFlag: boolean = true)
     }
 }
 // 检测位置是否改变了
-function checkSamePos(pos1: vscode.Position | undefined, pos2: vscode.Position | undefined) {
+export function checkSamePos(pos1: vscode.Position | undefined, pos2: vscode.Position | undefined) {
     if (pos1 == null || pos2 == null) {
         logger.error('!position error!')
         return false;
@@ -392,7 +392,7 @@ export async function saveFile(content: string, count: number, selectFlag: boole
         await textEditor.document.save();
     }
 
-    // logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
+    logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
 }
 // 获取本地有效的文件名
 export async function getValidFileName(dest: string, filename: string, content?: Buffer): Promise<string> {

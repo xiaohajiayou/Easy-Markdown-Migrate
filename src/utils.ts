@@ -1,25 +1,17 @@
-import { rename,newName, saveFile, getValidFileName,getMdPath,
+import {remotePath, rename,newName, saveFile, getValidFileName,getMdPath,
     getMdEditor,getImages,mdCheck,setPara,escapeStringRegexp, 
-    switchPath,urlFormatted,myEncodeURI} from './lib/common';
+    switchPath,urlFormatted,myEncodeURI,insertText,ulTimeout,timeoutPromise,convertPath,checkSamePos} from './lib/common';
 
 
 import { download } from './lib/download';
 import { getLang } from './lib/lang';
-
+import { window, ProgressLocation } from 'vscode'
 
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
 
-let imagePathBracket = 'auto';
-let mdFileAfterRename = ''; // 需要处理的文件
-let oMdFileAfterRename: path.ParsedPath; // mdFile的对象结构
-
-let docTextEditorAfterRename: vscode.TextEditor | undefined; // 选择的MD文件
-let docPreSelectionAfterRename: vscode.Selection | undefined; // 选择的范围
-let openAfterTransfer = false; // 是否打开文件
-let savedFileObj:{ local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } |undefined ;
 // 常用控制台颜色清单
 const colorDict =
 {
@@ -55,6 +47,29 @@ let msgHash = {
     'error': [] as string[],
     'info': [] as string[],
 }
+
+
+let imagePathBracket = 'auto';
+
+let mdFileAfterRename = ''; // 需要处理的文件
+let oMdFileAfterRename: path.ParsedPath; // mdFile的对象结构
+let docTextEditorAfterRename: vscode.TextEditor | undefined; // 选择的MD文件
+let docPreSelectionAfterRename: vscode.Selection | undefined; // 选择的范围
+
+
+let mdFileAfterCopy = ''; // 需要处理的文件
+let oMdFileAfterCopy: path.ParsedPath; // mdFile的对象结构
+let docTextEditorAfterCopy: vscode.TextEditor | undefined; // 选择的MD文件
+let docPreSelectionAfterCopy: vscode.Selection | undefined; // 选择的范围
+
+// save images obj for paste
+let savedFileObj:{ local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } |undefined ;
+
+let openAfterTransfer = false; // 是否打开文件
+
+let myPicgo: any = null; // picgo对象
+let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会自动增加文件夹以将不同md文件的图片分离开
+
 
 export async function cropContent(selectFlag:boolean= true) {
     let fileObj = getImages(selectFlag);
@@ -229,7 +244,7 @@ export function suspendedLogMsg(modal: boolean = false) {
 
 export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
     try {
-        var obj = getStatus(docTextEditor);
+        var obj = getRenamedImgs(docTextEditor);
         if (obj.content == '') { return; }
         logger.info(`\n`, false);
         logger.info(`+------------------------------------+`, false);
@@ -615,7 +630,146 @@ export async function vscDownload() {
 
 
 
-export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } {
+export async function upCheck() {
+    try {
+        const { PicGo } = require('picgo');
+        myPicgo = PicGo;
+    } catch (e) {
+        // let res = await installPicgo()
+        // if( res == 'ok')
+        // {
+        //     promptToReloadWindow(getLang('picgotry'))
+        // }else{
+        //     logger.error(getLang('picgofail'))
+        // }
+        logger.error('PicGo init error:');
+        console.log(e);
+        return false;
+    }
+    // 需要处理的文件
+    // 对MD的结构化
+    remote = convertPath(remotePath)
+    return true;
+}
+
+export async function upload(clipBoard: boolean = false) // ,thread:number
+{
+    const picgo1 = new myPicgo(); // 将使用默认的配置文件：~/.picgo/config.json
+    picgo1.on('beforeUpload', (ctx: any) => {
+        let fileName = ctx.output[0].fileName;
+        let upFile = path.parse(fileName);
+        if (rename) {
+            // 36 进制重命名上传后的文件
+            fileName = path.join(upFile.dir, new Date().getTime().toString(36) + upFile.ext);
+        }
+        if (remote != '') {
+            // 需要添加 md名的目录
+            ctx.output[0].fileName = `${remote}/` + fileName;
+        }
+        // console.log(ctx.output) // [{ base64Image, fileName, width, height, extname }]
+    });
+    let fileMapping: Record<string, any>;
+    let fileArr;
+    let content = '';
+    if (clipBoard) {
+        fileArr = [''];
+    } else {
+        await saveCopiedMsg();
+        let fileObj = getRenamedImgs(docTextEditorAfterCopy); // 根据选择的内容上传
+        fileArr = fileObj.local; // 本地文件上传
+        fileMapping = fileObj.mapping; // 本地原始信息
+        content = fileObj.content;
+        if (fileArr.length == 0) {
+            logger.error(getLang('docSelect'))
+            return;
+        }
+    }
+    logger.info(`Uploading image, please wait.`, true,true);
+    
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set();
+    fileArr.forEach((item) => set.add(item));
+    let upArr: string[] = Array.from(set) as string[];
+    let count = 0, len = upArr.length;
+    let successCount = 0;
+
+    // 一直等着下载完毕，超时100秒
+    let rres: any;
+    var p = new Promise((resolve, reject) => {
+        rres = resolve;
+    });
+    window.withProgress({ title: getLang('uping'), location: ProgressLocation.Notification }, async (progress, token) => {
+        for (let file of upArr) {
+            count++;
+            if (clipBoard) {
+                file = 'clipboard';
+            }
+            logger.info(`uploading [${file}], ${count}/${len}`, false);
+            let fileBasename = path.basename(file)
+            progress.report({ increment: count / len * 100, message: getLang('uping2', fileBasename , count, len) });
+            try {
+                let upList: string[] = [];
+                if (!clipBoard) {
+                    upList = [file];
+                }
+                // 一次上传一个
+                let netFile = await timeoutPromise(picgo1.upload(upList), ulTimeout*1000 ,getLang('uptimeout',fileBasename,ulTimeout));
+                // 成功上传返回结果
+                if(netFile == '')
+                {
+                    // 超时
+                    console.log('timeout continue')
+                    continue; 
+                }else if (netFile.length > 0) {
+                    let first = netFile[0];
+                    let imgPath = first.imgUrl||first.url;
+                    if(imgPath==null || imgPath =='')
+                    {
+                        logger.error(getLang('uploadFail',file));
+                        console.log(first)
+                        continue; 
+                    }
+                    if (clipBoard) {
+                        content = '![](' + imgPath + ')';
+                    } else {
+                        // 适配图片的格式
+                        var reg = new RegExp('!\\[([^\\]]*)\\]\\(' + escapeStringRegexp(fileMapping[file]) + '\\)', 'ig');
+                        content = content.replace(reg, '![$1](' + imgPath + ')'); // 内容替换
+                    }
+                    successCount++;
+                }else{
+                    logger.error(getLang('uploadFail',file)+'-2');
+                    console.log(netFile)
+                    continue; 
+                }
+            } catch (e) {
+                console.log(e);
+                logger.error(getLang('uperror', fileBasename, (e as any).message || ''));
+                rres('error')
+                return Promise.resolve()
+            }
+        }
+        if (clipBoard) {
+            await insertText(content);
+        } else {
+            await saveFileRenamed(content, successCount);
+            showStatus(docTextEditorAfterCopy);
+
+            // if(!openAfterTransfer) {
+            //     await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
+            // }
+        }
+        rres('finish')
+        return Promise.resolve()
+        //else return Promise.reject()
+    });
+    return p;
+}
+
+
+
+export function getRenamedImgs(docTextEditor: vscode.TextEditor | undefined): {local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } {
     var picArrLocal: string[] = [];
     var oriMapping = {};
     var picArrInvalid: string[] = [];
@@ -631,10 +785,6 @@ export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local:
         return retObj;
     }
 
-    if (currentEditor == null) {
-        logger.error(getLang('docAct'))
-        return retObj;
-    }
     let document = currentEditor.document; // 当前编辑内容 ，可能因选择文件等导致不是当前文件
     // 对整个文件内容操作
     if (document.isDirty) { // 文件是否被修改过
@@ -657,7 +807,7 @@ export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local:
         //const pattern = /!\[(.*?)\]\((.*?)\)/gm // 匹配图片正则
         // const imgList = str.match(pattern) || [] // ![img](http://hello.com/image.png)
         // let tmpPicArrNet: string[] = [],tmpPicArrLocal: string[]=[],tmpPicArrInvalid: string[]=[],tmpOriMapping={};
-        findStatus(document.uri.fsPath,reg, str, imagePathBracket == 'auto', picArrNet, picArrLocal, picArrInvalid, oriMapping);
+        findRenamedImage(document.uri.fsPath,reg, str, imagePathBracket == 'auto', picArrNet, picArrLocal, picArrInvalid, oriMapping);
         /*if(picArrInvalid.length>0 && )
         {
             // 尝试有括号重新查找
@@ -680,7 +830,7 @@ export function getStatus(docTextEditor: vscode.TextEditor | undefined): {local:
 }
 
 
-export function findStatus(mdFile: string,reg: any, str: string, auto: boolean, tmpPicArrNet: string[], tmpPicArrLocal: string[], tmpPicArrInvalid: string[], tmpOriMapping: Record<string, any>) {
+export function findRenamedImage(mdFile: string,reg: any, str: string, auto: boolean, tmpPicArrNet: string[], tmpPicArrLocal: string[], tmpPicArrInvalid: string[], tmpOriMapping: Record<string, any>) {
     //var mdfileName = fs.realpathSync(mdFile);
     var mdfilePath = path.dirname(mdFile); //arr.join('/'); // 获取文件路径
     while (true) {
@@ -714,59 +864,6 @@ export function findStatus(mdFile: string,reg: any, str: string, auto: boolean, 
         }
     }
 }
-
-// type MsgType = 'err' | 'warn' | 'info' | 'succ';
-// export let logger = {
-//     core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
-//         // 核心模块显示
-//         let color = '', hint = '', arr = [];
-//         switch (msgType) {
-//             case 'warn':
-//                 color = colorDict.yellow
-//                 hint = '[Warn]'
-//                 arr = msgHash.warn;
-//                 break;
-//             case 'succ':
-//                 color = colorDict.green
-//                 arr = msgHash.info;
-//                 break;
-//             case 'err':
-//                 color = colorDict.red
-//                 hint = '[Err]'
-//                 arr = msgHash.error;
-//                 break;
-//             case 'info':
-//                 color = colorDict.cyan
-//                 arr = msgHash.info;
-//                 break;
-//         }
-//         console.log(color, msg, colorDict.reset);
-//         out.appendLine(hint + msg);
-//         if (popFlag) {
-//             if (immediately) {
-//                 vscode.window.showWarningMessage(msg);
-//             } else {
-//                 arr.push(msg.toString());
-//             }
-//         }
-//     },
-//     warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-//         //console.log( chalk.yellow(...msg))
-//         this.core('warn', msg, popFlag, immediately);
-//     },
-//     success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-//         //console.log( chalk.green(...msg))
-//         this.core('succ', msg, popFlag, immediately);
-//     },
-//     error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-//         //console.log( chalk.red(...msg))
-//         this.core('err', msg, popFlag, immediately);
-//     },
-//     info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-//         //console.log( chalk.blue(...msg))
-//         this.core('info', msg, popFlag, immediately);
-//     }
-// };
 
 
 export async function openAndEditMarkdownFile(mdTargetFilePath: string): Promise<vscode.TextEditor | undefined> {
@@ -802,6 +899,132 @@ export function saveRenamedMsg(imageTargetFolder: string): boolean {
     // docPreSelection_after_rename = docTextEditor_after_rename?.selection; // 光标位置
     return true;
 }
+
+export async function saveCopiedMsg() {
+    let mdOriginFile = getOriginMdPath();
+    if (!mdOriginFile) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return ;
+    }
+    let mdOriginFileFolder = path.dirname(mdOriginFile);
+    let mdOriginFileName = path.basename(mdOriginFile);
+    let mdFileNameAfterCopy = 'online_'+mdOriginFileName; // 内部对象赋值，多个模块共用
+    mdFileAfterCopy = path.join(mdOriginFileFolder, mdFileNameAfterCopy);
+
+    try {
+
+        fs.copyFileSync(mdOriginFile, mdFileAfterCopy) // 内部对象赋值，多个模块共用
+        let currentEditor = getMdEditor(); // 获取初始活动文本编辑器
+        if(currentEditor == null) { return ; }
+
+        // 如果当前活动编辑器是被移动的文件，则关闭它
+  
+        await vscode.window.showTextDocument(currentEditor.document, currentEditor.viewColumn)
+        
+        await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+    
+
+        // 打开新位置的文件
+        await   openAndEditMarkdownFile(mdFileAfterCopy);
+                    
+        // 保存当前标签页
+        docTextEditorAfterCopy = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
+        // docPreSelection_after_rename = docTextEditor_after_rename?.selection; // 光标位置
+
+        oMdFileAfterCopy = path.parse(mdFileAfterCopy)
+        if(docTextEditorAfterCopy == null) { return; }
+        await docTextEditorAfterCopy.document.save();
+
+
+
+
+    } catch (error) {
+        // 类型保护
+        if (error instanceof Error) {
+            vscode.window.showErrorMessage(`Failed to move the Markdown file: ${error.message}`);
+        } else {
+            vscode.window.showErrorMessage(`Failed to move the Markdown file: ${String(error)}`);
+        }
+    }
+
+}
+
+export async function saveFileRenamed(content: string, count: number, selectFlag: boolean = false,cleanFlag: boolean = false) {
+    // if (count == 0) {
+    //     logger.warn(getLang('uptSucc3'));
+    //     return;
+    // }
+    // if (readonly) {
+    //     logger.warn(getLang('uptSucc2', count));
+    //     return;
+    // }
+    // let textEditor = await checkEditor(false)
+    let textEditor = docTextEditorAfterCopy;
+    if (textEditor == null) { return; }
+    if ((content.length > 0||cleanFlag) && textEditor != null) {
+        await textEditor.edit((editBuilder: vscode.TextEditorEdit) => {
+            let rang: vscode.Range;
+            if (selectFlag) {
+                // 替换选中的内容
+                let r = textEditor?.selection;
+                if (r == null) {
+                    logger.error(getLang('docSelect'))
+                    return;
+                }
+                rang = r;
+            } else {
+                const end = new vscode.Position(textEditor?.document.lineCount || 0 + 1, 0);
+                rang = new vscode.Range(new vscode.Position(0, 0), end)
+            }
+            editBuilder.replace(rang, content);
+        });
+        await textEditor.document.save();
+    }
+
+    logger.success(getLang('uptSucc', count, path.basename(mdFileAfterCopy)),false);
+}
+
+
+// 检测编辑器是否改变了 active = true 表示点否则表示范围
+// export async function checkEditorRenamed(active: boolean) {
+//     let editor = docTextEditorAfterCopy;
+//     if (editor == null || editor.document.isClosed) {
+//         logger.error(getLang('closed'))
+//         return;
+//     }
+//     let uri = editor.document.uri;
+//     //vscode.commands.executeCommand<vscode.TextDocumentShowOptions>("vscode.open",uri);
+//     let editor2 = await vscode.window.showTextDocument(uri)
+//     // .then( editor => { 
+//     //     let same = docPreSelection?.active == editor.selection.active
+//     //     console.log('opened.....');
+//     //  },
+//     //error => { console.log(error) });
+//     //let now = vscode.window.activeTextEditor;
+//     // editor.document.isClosed , 文件可能切换或关闭了 now != editor
+//     if (active) {
+//         if (!checkSamePos(docPreSelection?.active, editor2.selection.active)) {
+//             if (skipSelectChange) {
+//                 logger.warn(getLang('posChg'))
+//             } else {
+//                 logger.error(getLang('posChg') + ',' + getLang('notChg'))
+//                 return;
+//             }
+//         }
+//     } else {
+//         if (!checkSamePos(docPreSelection?.start, editor2.selection.start) || !checkSamePos(docPreSelection?.end, editor2.selection.end)) {
+//             if (skipSelectChange) {
+//                 logger.warn(getLang('rangChg'))
+//             } else {
+//                 logger.error(getLang('rangChg') + ',' + getLang('notChg'))
+//                 return;
+//             }
+//         }
+//     }
+//     return editor2;
+// }
+
+
 export function getOriginFileName(): string | undefined {
     let mdFilePath = getMdPath();
     if (!mdFilePath) {
