@@ -1,8 +1,12 @@
-Easy Markdown Migrate
-====
-<div align="center"><a href="https://github.com/xiaohajiayou/Easy-Markdown-Migrate/blob/dev/README.md"><strong>中文</strong> </a>| <strong>English</strong></div>
+<div align="center" style="font-size: 1em;"><h1><strong>Easy Markdown Migrate</strong></h1></div>
+<div align="center" ><h5><a href="https://github.com/xiaohajiayou/Easy-Markdown-Migrate/blob/dev/README.md"><strong>中文</strong> </a>| <strong>English</strong><h5></div>   
 
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com)  ![GitHub License](https://img.shields.io/github/license/xiaohajiayou/Easy-Markdown-Migrate)
+<p align="center" style="margin-top: 10px;">
+  <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com" alt="Description">
+  <img src="https://img.shields.io/github/license/xiaohajiayou/Easy-Markdown-Migrate" alt="Description">
+  <img src="https://img.shields.io/visual-studio-marketplace/stars/Hacode.easy-markdown-migrate?color=%23FFA500%20" alt="Description">
+</p>
+
 
 
 **Easy Markdown Migrate** is a plugin designed for migrating `Markdown` files, binding files with the images linked within them, and helping users easily move, delete, copy, and paste files or content, making local management and image hosting backups simpler. 
@@ -28,14 +32,14 @@ The specific features apply to the following scenarios:
 *   Analyze the image links in the current file: `Analyze Image Links`
 *   Move the current file and images to another directory (automatically update image links): `Migrate Markdown File`
 *   Copy/Cut the selected content (including images) in the current file to another file in a different directory:
-    *   Copy the selected content: `Copy With Content`
-    *   Cut the selected content: `Cut With Content`
-    *   Paste the previously selected content: `Paste With Content`
+    *   Copy the selected content: `Copy Select Content`
+    *   Cut the selected content: `Cut Select Content`
+    *   Paste the previously selected content: `Paste Select Content`
 *   Upload local images to an image hosting service (automatically generate a file version on the image hosting service): `Upload Images`
 *   Download remote images to local for backup (automatically update to local image links): `Download Images`
 *   Select an image link in the file to move the image to another directory (automatically update the link): `Move Select Images`
 *   Insert an image from a local directory and automatically convert it to a relative path: `Absolute<->Relative`
-*   Select an image link in the file to delete the image to the trash (automatically remove the link): `Delete With Images`
+*   Select an image link in the file to delete the image to the trash (automatically remove the link): `Delete Select Images`
 *   Delete the current file to discard the file and images to the trash (automatically update the links): `Drop File to Trash`
 
 This plugin aims to reduce the cost of writing documents and make the process of writing casual documents more relaxed. Whether you are a beginner learning or a developer looking to improve management efficiency, Easy Markdown Migrate is an ideal choice for you.

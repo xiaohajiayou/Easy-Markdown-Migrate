@@ -1,8 +1,15 @@
-Easy Markdown Migrate
-====
-<div align="center"><strong>中文</strong> | <a href="https://github.com/xiaohajiayou/Easy-Markdown-Migrate/blob/dev/README_en.md"><strong>English</strong></a></div>
+<div align="center" style="font-size: 1em;"><h1><strong>Easy Markdown Migrate</strong></h1></div>  
+<div align="center" ><h5><strong>中文</strong> | <a href="https://github.com/xiaohajiayou/Easy-Markdown-Migrate/blob/dev/README_en.md"><strong>English</strong></a><h5></div>   
+<p align="center" >  
+  <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com" alt="Description">  
+  <img src="https://img.shields.io/github/license/xiaohajiayou/Easy-Markdown-Migrate" alt="Description">  
+  <img src="https://img.shields.io/visual-studio-marketplace/stars/Hacode.easy-markdown-migrate?color=%23FFA500%20" alt="Description">  
+</p>  
 
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com)  ![GitHub License](https://img.shields.io/github/license/xiaohajiayou/Easy-Markdown-Migrate)
+
+
+  
+
 
 
 **Easy Markdown Migrate** 是一个针对`Markdown`文件迁移而设计的插件，实现文件与链接背后的图片绑定，帮助用户轻松地移动、删除、复制、粘贴文件或内容，让本地管理和图床备份变得更简单。
