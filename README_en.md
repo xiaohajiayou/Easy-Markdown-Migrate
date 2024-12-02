@@ -23,7 +23,7 @@ Install the plugin through the [Extension Marketplace](https://marketplace.visua
 
 How to Use
 ---------------
-After opening a Markdown file, a context menu will appear when you right-click in the editing area as follows: ![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate_how_to_use/m4777wb8.png)
+After opening a Markdown file, a context menu will appear when you right-click in the editing area as follows: ![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate_how_to_use/m4777wb8.png)  
 The specific features apply to the following scenarios:
 *   Analyze the image links in the current file: `Analyze Image Links`
 *   Move the current file and images to another directory (automatically update image links): `Migrate Markdown File`
