@@ -100,7 +100,7 @@ export async function cropContent(selectFlag:boolean= true) {
             let b = escapeStringRegexp(fileMapping[file]);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
             //转为相对路径
-            content =  content.replace(reg,''); // 内容替换
+            content =  ''; // 内容替换
             count++;
         }catch(e)
         {
