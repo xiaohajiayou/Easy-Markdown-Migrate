@@ -2,7 +2,7 @@
   "name": "markdown-image-transferTool",
   "displayName": "markdown-image-transferTool",
   "description": "Tool auto-migrates images, preserving links, for local migration and image hosting backup.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "HaCode",
   "icon": "icon.png",
   "engines": {
