@@ -65,7 +65,7 @@ let docPreSelectionAfterCopy: vscode.Selection | undefined; // 选择的范围
 // save images obj for paste
 let savedFileObj:{ local: string[], net: string[], invalid: string[], mapping: Record<string, any>, content: string } |undefined ;
 
-let openAfterTransfer = false; // 是否打开文件
+let openAfterMigrate = false; // 是否打开文件
 
 let myPicgo: any = null; // picgo对象
 let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会自动增加文件夹以将不同md文件的图片分离开
@@ -392,7 +392,7 @@ export async function moveImg(lf:string,selectFlag:boolean= true) // ,thread:num
 }
 
 
-export async function transferImg(imageTargetFolder:string,selectFlag:boolean= false) // ,thread:number
+export async function migrateImg(imageTargetFolder:string,selectFlag:boolean= false) // ,thread:number
 {
 
     let fileObj = getImages(selectFlag);
@@ -443,7 +443,7 @@ export async function transferImg(imageTargetFolder:string,selectFlag:boolean= f
 
 
 
-export async function transferFile(localFolder: string) {
+export async function migrateFile(localFolder: string) {
 
     let mdFilePath = getMdPath();
     if (!mdFilePath) {
@@ -478,7 +478,7 @@ export async function transferFile(localFolder: string) {
         await docTextEditor.document.save();
 
         showStatus(docTextEditor);
-        if(!openAfterTransfer) {
+        if(!openAfterMigrate) {
             await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
         }
 
@@ -527,7 +527,7 @@ export async function drop(recycleBinPath:string) {
         await docTextEditor.document.save();
 
         showStatus(docTextEditor);
-        if(!openAfterTransfer) {
+        if(!openAfterMigrate) {
             await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
         }
         logger.success('Drop successfully.', true);
@@ -757,7 +757,7 @@ export async function upload(clipBoard: boolean = false) // ,thread:number
             await saveFileRenamed(content, successCount);
             showStatus(docTextEditorAfterCopy);
 
-            // if(!openAfterTransfer) {
+            // if(!openAfterMigrate) {
             //     await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
             // }
         }
@@ -1091,8 +1091,8 @@ export async function convertSelectUrl(selectFlag:boolean= true){
 // 初始化参数，参数保存于 common模块中
 export function initPara() {
     clearMsg();
-    let extendName = 'markdown-image-transfer';
-    let transferFlag = vscode.workspace.getConfiguration(extendName).get('openAfterTransfer') as boolean;
+    let extendName = 'easy-markdown-migrate';
+    let migrateFlag = vscode.workspace.getConfiguration(extendName).get('openAfterMigrate') as boolean;
     let hasBracket = vscode.workspace.getConfiguration(extendName).get('hasBracket') as string;
     let updateLink = vscode.workspace.getConfiguration(extendName).get('updateLink') as boolean;
     let skipSelectChange = vscode.workspace.getConfiguration(extendName).get('skipSelectChange') as boolean;
@@ -1111,7 +1111,7 @@ export function initPara() {
         , removeFolder,dlTimeout,ulTimeout,clipboardPath,urlFormatted);
     
     imagePathBracket = hasBracket; // 全局变量，用于判断是否需要带括号
-    openAfterTransfer = transferFlag; // 全局变量，用于判断是否需要打开图片
+    openAfterMigrate = migrateFlag; // 全局变量，用于判断是否需要打开图片
     let file = vscode.window.activeTextEditor?.document.uri.fsPath || '';
     if (!mdCheck(file)) {
         suspendedLogMsg();

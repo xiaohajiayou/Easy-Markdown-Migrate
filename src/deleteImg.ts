@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
 import { getLang } from './lib/lang';
-import {suspendedLogMsg,getOriginMdPath,transferImg,cleanSelectedLinks} from './utils'
+import {suspendedLogMsg,getOriginMdPath,migrateImg,cleanSelectedLinks} from './utils'
 
 export async function vscDeleteImgs(flag:boolean=false) {
     let mdOriginFilePath = getOriginMdPath();
@@ -42,7 +42,7 @@ export async function vscDeleteImgs(flag:boolean=false) {
     }
     // const recycleBinPath = path.join(rootPath, '.recycle');
 
-    // await transferImg(recycleImgPath,true);
+    // await migrateImg(recycleImgPath,true);
     // cleanMD(flag);
     cleanSelectedLinks(recycleImgPath);
     suspendedLogMsg();

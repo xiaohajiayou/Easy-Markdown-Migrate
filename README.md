@@ -1,4 +1,4 @@
-markdown-image-TransferTool
+Easy Markdown Migrate
 ====
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com) ![](https://camo.githubusercontent.com/bc6f05c412ba8cdde130fedab361781310a9707d4162a1745ffab4da4c9a7ac4/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6c6963656e73652f58506f65742f706963783f7374796c653d666c6174266c6f676f3d676974687562)
@@ -22,20 +22,20 @@ markdown-image-TransferTool
 
   具体功能适用场景如下：  
 - 分析当前文件的图片链接:  `Analyze Image Links`  
-- 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `transfer file`  
+- 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `migrate file`  
 - 剪切当前文件内选中内容（包括图片） --> 另外的目录下的文件内 :   
   - 剪切所选择的内容:  `Crop Select content`  
   - 粘贴之前选择的内容:  `Paste Select content`  
 + 上传本地图片 --> 图床（自动生成图床版文件） ：`Upload images`  
 + 下载远程图片 --> 本地备份 （自动更新为本地图片链接）：`Download images`  
 - 选择文件内图片链接 --> 移动图片到另外的目录（自动更新链接） ：`Move Select Images`  
-- 插入本地目录下的图片 --> 自动转换为相对路径 ：`Absolute<->Relative`  
+- 插入本地目录下的图片 --> 一键转换为相对路径 ：`Absolute<->Relative`  
 + 选择文件内的图片链接 --> 丢弃图片到垃圾桶（自动清除链接） ：`Delete Select Images`  
-+ 删除当前文件 --- 丢弃文件与图片到垃圾桶（自动更新链接） ：`Drop File to Trash`  
++ 删除当前文件 --> 丢弃文件与图片到垃圾桶（自动更新链接） ：`Drop File to Trash`  
 
 仓库地址
 ---------------
-https://github.com/xiaohajiayou/markdown-image-transferTool
+https://github.com/xiaohajiayou/Easy-Markdown-Migrate
 
 
 **使用愉快!**

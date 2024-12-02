@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import {drop,openAndEditMarkdownFile,analyze,showStatus,suspendedLogMsg,transferImg,getOriginMdPath} from './utils'
+import {drop,openAndEditMarkdownFile,analyze,showStatus,suspendedLogMsg,migrateImg,getOriginMdPath} from './utils'
 
 
 
@@ -44,7 +44,7 @@ export async function vscDropFile() {
     }
     const recycleBinPath = path.join(rootPath, '.recycle');
 
-    await transferImg(recycleImgPath);
+    await migrateImg(recycleImgPath);
     await drop(recycleBinPath);
     suspendedLogMsg();
 }

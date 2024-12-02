@@ -2,10 +2,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
 import { getLang } from './lib/lang';
-import {transferFile,analyze,showStatus,openAndEditMarkdownFile,suspendedLogMsg,logger,transferImg} from './utils'
+import {migrateFile,analyze,showStatus,openAndEditMarkdownFile,suspendedLogMsg,logger,migrateImg} from './utils'
 
 
-export async function vscTransfer() {
+export async function vscMigrate() {
     const result = await vscode.window.showOpenDialog({
         canSelectFiles: false,
         canSelectFolders: true,
@@ -36,7 +36,7 @@ export async function vscTransfer() {
         console.log(`Directory already exists: ${imageTargetFolder}`);
     }
 
-    await transferImg(imageTargetFolder);
-    await transferFile(localFolder);
+    await migrateImg(imageTargetFolder);
+    await migrateFile(localFolder);
     suspendedLogMsg();
 }

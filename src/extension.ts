@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import {initPara,vscDownload}  from './utils';
 import {vscAnalyze} from './analyze';
 import {vscDropFile} from './drop';
-import {vscTransfer} from './transfer';
+import {vscMigrate} from './migrate';
 import {vscMove} from './moveImg';
 import {vscDeleteImgs} from './deleteImg';
 import { vscPaste,vscCrop  } from './copyPaste';
@@ -16,12 +16,12 @@ import { vscUpload } from './uploadImgs';
 export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, extension "markdown-image-transfer" is now active!');
+	console.log('Congratulations, extension "easy-markdown-migrate" is now active!');
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	/*let disposable = vscode.commands.registerCommand("markdown-image-transfer.helloWorld", async () => {
+	/*let disposable = vscode.commands.registerCommand("easy-markdown-migrate.helloWorld", async () => {
 		let answer = await vscode.window.showInformationMessage("How was your day ?", "good", "bad",)
 		if (answer === "bad") {
 			vscode.window.showErrorMessage("sorry to hear it", "1", "2","3","4")
@@ -30,52 +30,52 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showWarningMessage("sorry to hear it")
 		}
 	})*/
-	//let obj2 = vscode.workspace.getConfiguration('markdown-image-transfer');
-	//console.log('globalState',context.globalState.get('markdown-image-transfer.hasBracket'));
+	//let obj2 = vscode.workspace.getConfiguration('easy-markdown-migrate');
+	//console.log('globalState',context.globalState.get('easy-markdown-migrate.hasBracket'));
 	// if(!initPara()){return;} // 从配置中获取初始化参数
-	let dispAnalyze = vscode.commands.registerCommand("markdown-image-transfer.analyze", async (textEditor: vscode.TextEditor) => {
+	let dispAnalyze = vscode.commands.registerCommand("easy-markdown-migrate.analyze", async (textEditor: vscode.TextEditor) => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscAnalyze();
 
 	})
-	let dispMoveAll = vscode.commands.registerCommand("markdown-image-transfer.transfer", async () => {
+	let dispMoveAll = vscode.commands.registerCommand("easy-markdown-migrate.migrate", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
-		vscTransfer();
+		vscMigrate();
 	})
-	let dispCrop = vscode.commands.registerCommand("markdown-image-transfer.crop", async () => {
+	let dispCrop = vscode.commands.registerCommand("easy-markdown-migrate.crop", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscCrop();
 	})
-	let dispPaste = vscode.commands.registerCommand("markdown-image-transfer.paste", async () => {
+	let dispPaste = vscode.commands.registerCommand("easy-markdown-migrate.paste", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscPaste();
 	})
 
 
-	let dispDownload = vscode.commands.registerCommand("markdown-image-transfer.download", async () => {
+	let dispDownload = vscode.commands.registerCommand("easy-markdown-migrate.download", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscDownload();
 	})
-	let dispUpload = vscode.commands.registerCommand("markdown-image-transfer.upload", async () => {
+	let dispUpload = vscode.commands.registerCommand("easy-markdown-migrate.upload", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscUpload();
 	})
 
-	let dispMove = vscode.commands.registerCommand("markdown-image-transfer.moveLocalImage", async () => {
+	let dispMove = vscode.commands.registerCommand("easy-markdown-migrate.moveLocalImage", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscMove();
 	})
-	let dispConvert = vscode.commands.registerCommand("markdown-image-transfer.convert", async () => {
+	let dispConvert = vscode.commands.registerCommand("easy-markdown-migrate.convert", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscConvertUrl();
 	})
 
 
-	let dispClean = vscode.commands.registerCommand("markdown-image-transfer.clean", async () => {
+	let dispClean = vscode.commands.registerCommand("easy-markdown-migrate.clean", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscDeleteImgs();
 	})
-	let dispDropFile = vscode.commands.registerCommand("markdown-image-transfer.drop", async () => {
+	let dispDropFile = vscode.commands.registerCommand("easy-markdown-migrate.drop", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscDropFile();
 	})
