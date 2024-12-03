@@ -146,11 +146,6 @@
           "default": false,
           "description": "%easy-markdown-migrate.openAfterMigrate%"
         },
-        "easy-markdown-migrate.removeFolder": {
-          "type": "string",
-          "default": "md-img-remove",
-          "description": "%easy-markdown-migrate.removeFolder%"
-        },
         "easy-markdown-migrate.hasBracket": {
           "type": "string",
           "default": "auto",
@@ -163,7 +158,7 @@
         },
         "easy-markdown-migrate.imageSaveFolder": {
           "type": "string",
-          "default": "<filename>.assets",
+          "default": "images",
           "description": "%easy-markdown-migrate.imageSaveFolder%"
         },
         "easy-markdown-migrate.updateLink": {
@@ -195,11 +190,6 @@
           "type": "number",
           "default": 10,
           "description": "%easy-markdown-migrate.uploadTimeout%"
-        },
-        "easy-markdown-migrate.clipboardPath": {
-          "type": "string",
-          "default": "<filename>.assets/<YYMMDDHHmmss>.png",
-          "description": "%easy-markdown-migrate.clipboardPath%"
         },
         "easy-markdown-migrate.urlFormatted": {
           "type": "boolean",
