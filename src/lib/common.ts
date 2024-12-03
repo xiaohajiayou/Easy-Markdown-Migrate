@@ -14,10 +14,8 @@ export let skipSelectChange = false; // 是否只读，默认修改内容
 export let overwriteFile = false; // 是否覆盖原先的md文件，此选项不用
 export let rename = true; // 是否下载的图片重新命名
 export let remotePath = ''; // 远程路径
-export let removeFolder = ''; // 移入的文件夹
 export let dlTimeout = 10; // 下载超时
 export let ulTimeout = 10; // 上传超时
-export let clipboardPath = ''; // 剪切板图片默认路径
 export let urlFormatted = true; // URL格式神需要转义
 
 let mdFile = ''; // 需要处理的文件
@@ -146,18 +144,15 @@ export function escapeStringRegexp(string: string) {
 
 // 设置相关内部变量
 export function setPara(bracket: string, ren: boolean, read: boolean, skip: boolean
-    , local: string, remote: string, rem: string
-    , dl: number, ul: number, cb: string, urlf: boolean) {
+    , local: string, remote: string, dl: number, ul: number, urlf: boolean) {
     imagePathBracket = bracket;
     rename = ren;
     skipSelectChange = skip;
     readonly = !read; // 含义相反
     localFolder = local;
     remotePath = remote;
-    removeFolder = rem;
     dlTimeout = dl;
     ulTimeout = ul;
-    clipboardPath = cb;
     urlFormatted = urlf;
 }
 // 本地文件的通用检查 , 检查后备份相关相关变量

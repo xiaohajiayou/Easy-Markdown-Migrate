@@ -36,14 +36,14 @@
 - 分析当前文件的图片链接:  `Analyze Image Links`  
 - 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `Migrate Markdown File`  
 - 复制/剪切当前文件内选中内容（包括图片） --> 另外的目录下的文件内 : 
-  - 复制所选择的内容:  `Copy Select Content`  
-  - 剪切所选择的内容:  `Cut Select Content`  
-  - 粘贴之前选择的内容:  `Paste Select Content`  
+  - 复制所选择的内容:  `Copy With Content`  
+  - 剪切所选择的内容:  `Cut With Content`  
+  - 粘贴之前选择的内容:  `Paste With Content`  
 + 上传本地图片 --> 图床（自动生成图床版文件） ：`Upload Images`  
 + 下载远程图片 --> 本地备份 （自动更新为本地图片链接）：`Download Images`  
 - 选择文件内图片链接 --> 移动图片到另外的目录（自动更新链接） ：`Move Select Images`  
 - 插入本地目录下的图片 --> 一键转换为相对路径 ：`Absolute<->Relative`  
-+ 选择文件内的图片链接 --> 丢弃图片到垃圾桶（自动清除链接） ：`Delete Select Images`  
++ 选择文件内的图片链接 --> 丢弃图片到垃圾桶（自动清除链接） ：`Delete With Images`  
 + 删除当前文件 --> 丢弃文件与图片到垃圾桶（自动更新链接） ：`Drop File to Trash`  
 
 这个插件旨在减少撰写文档的成本，同时也让撰写随笔文档的过程更加轻松。无论您是正在学习的新手还是希望提高管理效率的开发者，Easy Markdown Migrate 都是您的理想选择。

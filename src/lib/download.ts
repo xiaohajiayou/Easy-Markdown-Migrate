@@ -7,7 +7,7 @@ import {
     getAutoPath, saveFile, localCheck, 
     timeoutPromise,dlTimeout
 } from './common'
-import { logger } from '../utils';
+import { logger ,convertAbOrRelative} from '../utils';
 import { getLang } from './lang.js';
 // 主要内部变量
 //var downThread = 1;
@@ -48,7 +48,8 @@ export async function download() // ,thread:number
                 let newfile = getAutoPath(resfile);
                 // 适配图片的格式
                 var reg = new RegExp('!\\[([^\\]]*)\\]\\(' + escapeStringRegexp(file) + '\\)', 'ig');
-                content = content.replace(reg, '![$1](' + newfile + ')'); // 内容替换
+                let relativeNewFile = convertAbOrRelative(newfile);
+                content = content.replace(reg, '![$1](' + relativeNewFile + ')'); // 内容替换
                 successCount++;
             } catch (e) {
                 console.log(e)

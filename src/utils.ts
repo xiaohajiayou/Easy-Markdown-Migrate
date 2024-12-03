@@ -110,7 +110,7 @@ export async function copyContent(selectFlag:boolean= true) {
         }
     }
     await saveFile(content,count,selectFlag);
-    logger.success('Cut successfully.', true);
+    logger.success('copy successfully.', true);
 }
 export async function cutContent(selectFlag:boolean= true) {
     let cleanFlag = true;
@@ -629,7 +629,7 @@ function cleanInvalidLinks() {
         logger.error(e.message);
     }
 }
-export async function cleanSelectedLinks(imageTargetFolder:string,selectFlag:boolean= true) {
+export async function cleanWithSelectedLinks(imageTargetFolder:string,selectFlag:boolean= true) {
     let cleanFlag = true;
     let fileObj = getImages(selectFlag); // 获取图片信息
     if (fileObj.content == '') {
@@ -667,7 +667,7 @@ export async function cleanSelectedLinks(imageTargetFolder:string,selectFlag:boo
             let b = escapeStringRegexp(fileMapping[file]);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
             let a = convertAbOrRelative( newFile) ;
-            content =  content.replace(reg,''); // 清空内容
+            content =  ''; // 清空内容
             count++;
         }catch(e)
         {
@@ -1154,16 +1154,14 @@ export function initPara() {
     let rename = vscode.workspace.getConfiguration(extendName).get('rename') as boolean;
     let remotePath: string = vscode.workspace.getConfiguration(extendName).get('remotePath') || '<filename>';
     let imageSaveFolder: string = vscode.workspace.getConfiguration(extendName).get('imageSaveFolder') || '<filename>.assets';
-    let removeFolder: string = vscode.workspace.getConfiguration(extendName).get('removeFolder') || 'md-img-remove';
     let dlTimeout: number = vscode.workspace.getConfiguration(extendName).get('timeoutDownload') || 10;
     let ulTimeout: number = vscode.workspace.getConfiguration(extendName).get('timeoutUpload') || 10;
-    let clipboardPath: string = vscode.workspace.getConfiguration(extendName).get('clipboardPath') || '<filename>.assets/<YYMMDDHHmmss>.png';
     let urlFormatted: boolean = vscode.workspace.getConfiguration(extendName).get('urlFormatted') || true;
     if(dlTimeout<=0) {dlTimeout =10;}
     if(ulTimeout<=0) {ulTimeout =10;}
     //const isAsync: boolean = vscode.workspace.getConfiguration().get('downloadImageInMarkdown.isAsync') as boolean;
     setPara(hasBracket, rename, updateLink,skipSelectChange, imageSaveFolder, remotePath
-        , removeFolder,dlTimeout,ulTimeout,clipboardPath,urlFormatted);
+        ,dlTimeout,ulTimeout,urlFormatted);
     
     imagePathBracket = hasBracket; // 全局变量，用于判断是否需要带括号
     openAfterMigrate = migrateFlag; // 全局变量，用于判断是否需要打开图片
