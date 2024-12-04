@@ -74,6 +74,7 @@ let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会�
 
 
 export async function copyContent(selectFlag:boolean= true) {
+    cutFileObj = undefined
     let fileObj = getImages(selectFlag);
     if(fileObj.content == '')
         {
@@ -113,6 +114,7 @@ export async function copyContent(selectFlag:boolean= true) {
     logger.success('copy successfully.', true);
 }
 export async function cutContent(selectFlag:boolean= true) {
+    copyFileObj!= undefined
     let cleanFlag = true;
     let fileObj = getImages(selectFlag);
     if(fileObj.content == '')
