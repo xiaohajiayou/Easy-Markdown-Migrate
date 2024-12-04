@@ -89,7 +89,7 @@ let defaultLang:Record<langGroup, string>= {
     ,posChg: "Cursor position changed"
     ,rangChg: "Select Range changed"
     ,notChg: "not update link by setting"
-    ,fileExist: "file[%s]not exist, please save first!"
+    ,fileExist: "file[%s]not exist, focus text field first or save the file before proceeding."
     ,notfoundscript: "!!Can not find the clipborad script[%s]!!"
     ,noCBimage: "Image not found in clipboard!"
 }
