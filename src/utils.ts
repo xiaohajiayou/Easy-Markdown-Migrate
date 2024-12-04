@@ -40,7 +40,7 @@ const colorDict =
     'whiteBG': '\x1B[47m' // 背景色为白色
 };
 // VSCode 输出控制台
-let out: vscode.OutputChannel = vscode.window.createOutputChannel("Mardown Image Manage");
+let out: vscode.OutputChannel = vscode.window.createOutputChannel("easy-markdown-migrate");
 // 提示框同一时刻最多显示3个，所以短时间内多个相同输入，进行合并
 let msgHash = {
     'warn': [] as string[],

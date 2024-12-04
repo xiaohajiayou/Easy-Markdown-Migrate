@@ -22,7 +22,7 @@
 
 此外，Easy Markdown Migrate 还提供了图床上传、图片下载、图片移动、图片删除等功能，这些内容可以帮助习惯本地管理的开发者发布博客所需的图床版本备份；也可以方便习惯图床管理的开发者，将远程图片下载到本地，维护本地备份。这些操作都自动维护图片与文件的关系，保证图片链接的正确性。
 
-我们的目标是让`Markdown`文档管理不仅高效，而且更加小白友好。即使是从未使用过`Markdown`的新手，甚至可以只在根目录新建一个`./images`文件夹，在里面存放所有图片，然后通过插件的功能，实现可靠的迁移管理。
+我们的目标是让`Markdown`文档管理不仅高效，而且更加小白友好。即使是从未使用过`Markdown`的新手，甚至可以将所有文件和图片放在根目录，然后通过`Easy Markdown Migrate`实现可靠的迁移管理。
 
 如何安装
 ---------------
@@ -30,9 +30,11 @@
 
 如何使用
 ---------------
-打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate_how_to_use/m4777wb8.png)
+**本插件提供菜单和常用快捷键两种使用方式，具体如下：**
+**菜单使用指南：**   
+打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate_how_to_use/m4777wb8.png)    
 
-  具体功能适用场景如下：  
+  具体功能适用场景如下：    
 - 分析当前文件的图片链接:  `Analyze Image Links`  
 - 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `Migrate Markdown File`  
 - 复制/剪切当前文件内选中内容（包括图片） --> 另外的目录下的文件内 : 
@@ -46,7 +48,62 @@
 + 选择文件内的图片链接 --> 丢弃图片到垃圾桶（自动清除链接） ：`Delete With Images`  
 + 删除当前文件 --> 丢弃文件与图片到垃圾桶（自动更新链接） ：`Drop File to Trash`  
 
+
+* * *
+
+**快捷键使用指南**  
+以下是 Easy Markdown Migrate 插件中常用功能对应的快捷键，帮助您快速执行常用操作：  
+
+- 分析图片链接（Analyze Image Links）
+  *   Windows/Linux: `Ctrl` + `Shift` + `A`
+  *   macOS: `Cmd` + `Shift` + `A`  
+- **功能描述：** 分析当前Markdown文件中的图片链接，为迁移操作做准备。
+
+
++ 迁移文件（Migrate Markdown File）
+  *   Windows/Linux: `Ctrl` + `Shift` + `M`
+  *   macOS: `Cmd` + `Shift` + `M`
++ **功能描述：** 迁移当前Markdown文件及其关联图片到新的位置，并自动更新图片链接。
+
+
+- 复制选中内容（Copy Select Content）
+  *   Windows/Linux: `Ctrl` + `Shift` + `C`
+  *   macOS: `Cmd` + `Shift` + `C`
+- **功能描述：** 复制Markdown文件中选中的内容，包括图片，到剪贴板。
+
+
++ 剪切选中内容（Cut Select Content）
+  *   Windows/Linux: `Ctrl` + `Shift` + `X`
+  *   macOS: `Cmd` + `Shift` + `X`
++ **功能描述：** 剪切Markdown文件中选中的内容，包括图片，到剪贴板，并从原始位置移除。
+
+
+- 粘贴选中内容（Paste Select Content）
+  *   Windows/Linux: `Ctrl` + `Shift` + `V`
+  *   macOS: `Cmd` + `Shift` + `V`
+- **功能描述：** 将剪贴板中的Markdown内容（包括图片）粘贴到当前文件的光标位置。
+
+**使用前提：** 所有快捷键均在编辑器文本域有焦点时有效（`editorTextFocus`）。
+
+**自定义快捷键：** 如果您需要更改这些快捷键，可以在VSCode的快捷键设置中进行自定义。
+*   打开VSCode设置（`Ctrl` + `,` 或 `Cmd` + `,`）。
+*   搜索“Keyboard Shortcuts”。
+*   找到 `easy-markdown-migrate.deleteImage` 命令。
+*   点击快捷键字段，然后按下您希望设置的新快捷键组合。
+
+**注意：**
+
+*   在执行复制、剪切或粘贴操作前，请确保您已经选中了需要操作的内容。
+*   迁移文件操作会移动文件和图片，请确保目标位置正确，以避免数据混乱。
+*   **插件不会删除资源，删除内容都在项目根路径`.recycle`文件中**。
+
+通过这些快捷键，您可以更高效地管理Markdown文件及其关联的图片。如果您有任何疑问或建议，欢迎通过我们的插件页面提出。
+
+* * *
+
 这个插件旨在减少撰写文档的成本，同时也让撰写随笔文档的过程更加轻松。无论您是正在学习的新手还是希望提高管理效率的开发者，Easy Markdown Migrate 都是您的理想选择。
+
+
 
 
 仓库地址
