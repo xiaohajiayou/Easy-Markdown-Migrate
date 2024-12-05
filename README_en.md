@@ -1,3 +1,4 @@
+
 <div align="center" style="font-size: 1em;"><h1><strong>Easy Markdown Migrate</strong></h1></div>
 <div align="center" ><h5><a href="https://github.com/xiaohajiayou/Easy-Markdown-Migrate/blob/dev/README.md"><strong>中文</strong> </a>| <strong>English</strong><h5></div>   
 
@@ -27,7 +28,7 @@ Install the plugin via the [Extension Marketplace](https://marketplace.visualstu
 **How to Use**  
 --------------
 
-**Menu Usage Guide:** After opening a Markdown file, a context menu will appear when you right-click in the editing area as follows: ![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate_how_to_use/m4777wb8.png)  
+**Menu Usage Guide:** After opening a Markdown file, a context menu will appear when you right-click in the editing area as follows: ![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/migrate_read_me/m4bicve4.png)
  
 The specific features apply to the following scenarios:  
 

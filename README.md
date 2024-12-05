@@ -12,13 +12,13 @@
 
 
 
-**Easy Markdown Migrate** 是一个针对`Markdown`文件迁移而设计的插件，实现文件与链接背后的图片绑定，帮助用户轻松地移动、删除、复制、粘贴文件或内容，让本地管理和图床备份变得更简单。
+**Easy Markdown Migrate** 是一个针对`Markdown`文件迁移而设计的插件，实现`url`链接与背后图片的绑定，帮助用户在移动、删除、复制、粘贴、上传、下载等场景下，保持图片链接的有效性，让本地管理和图床备份变得更简单。
 
 
 
 项目简介
 ---------------
-通过这个插件，用户只需专注于撰写文档，插件会自动识别文件中的图片链接，并将其与背后图片匹配，可以实现同一级目录下文件与图片的快速分类。只需要简单的点击菜单选项`migrate file` 或`Copy Select content`、`Paste Select content` ，即可将文件与图片迁移到你所需的位置，实现文件与图片的无缝迁移，极大地提高了文档管理的效率。
+通过这个插件，用户只需专注于撰写文档，插件会自动识别文件中的图片链接，并将其与背后图片匹配，实现文件与图片的快速分类和移动。您只需要简单的通过快捷键使用`migrate file` 或`Copy With Content`、`Paste With Content` ，即可将文件与图片迁移到你所需的位置，极大地提高了文档管理的效率。
 
 此外，Easy Markdown Migrate 还提供了图床上传、图片下载、图片移动、图片删除等功能，这些内容可以帮助习惯本地管理的开发者发布博客所需的图床版本备份；也可以方便习惯图床管理的开发者，将远程图片下载到本地，维护本地备份。这些操作都自动维护图片与文件的关系，保证图片链接的正确性。
 
@@ -30,11 +30,11 @@
 
 如何使用
 ---------------
-**本插件提供菜单和常用快捷键两种使用方式，具体如下：**
+**本插件提供菜单和常用快捷键两种使用方式，具体如下：**  
 **菜单使用指南：**   
-打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate_how_to_use/m4777wb8.png)    
+打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/migrate_read_me/m4bictm4.png)  
 
-  具体功能适用场景如下：    
+功能介绍如下：    
 - 分析当前文件的图片链接:  `Analyze Image Links`  
 - 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `Migrate Markdown File`  
 - 复制/剪切当前文件内选中内容（包括图片） --> 另外的目录下的文件内 : 
@@ -47,6 +47,8 @@
 - 插入本地目录下的图片 --> 一键转换为相对路径 ：`Absolute<->Relative`  
 + 选择文件内的图片链接 --> 丢弃图片到垃圾桶（自动清除链接） ：`Delete With Images`  
 + 删除当前文件 --> 丢弃文件与图片到垃圾桶（自动更新链接） ：`Drop File to Trash`  
+  
+具体使用方法及使用案例，请参考[插件使用文档](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki/Easy%E2%80%90Markdown%E2%80%90Migrate-document)。
 
 
 * * *
