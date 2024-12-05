@@ -2,7 +2,7 @@
   "name": "easy-markdown-migrate",
   "displayName": "Easy Markdown Migrate",
   "description": "Migrate images along with Markdown files or pastes, ensuring links remain intact.",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "publisher": "HaCode",
   "icon": "icon.png",
   "engines": {
