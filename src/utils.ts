@@ -1,6 +1,6 @@
 import {remotePath, rename,newName, saveFile, getValidFileName,getMdPath,
     getMdEditor,getImages,mdCheck,setPara,escapeStringRegexp, 
-    switchPath,urlFormatted,myEncodeURI,insertText,ulTimeout,timeoutPromise,convertPath,checkSamePos} from './lib/common';
+    switchPath,urlFormatted,myEncodeURI,insertText,ulTimeout,timeoutPromise,convertPath} from './lib/common';
 
 
 import { download } from './lib/download';
@@ -234,44 +234,25 @@ export function clearMsg() {
     out.show();
 }
 
-export function analyze() {
-    try {
-        var obj = getImages();
-        if (obj.content == '') { return; }
-        logger.info(`\n`, false);
-        logger.info(`+------------------------------------+`, false);
-        logger.info(`|    Image Links Analyse Report      |`, false);
-        logger.info(`+------------------------------------+`, false);
-        logger.info(`|       * Local Images: ${obj.local.length} *     `, false);
-        
-        obj.local.forEach(image => {
-            logger.info(`|  ${image}                                      `, false);
-        });
-        logger.info(`+------------------------------------+`, false);
-        logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
-        
-        obj.net.forEach(image => {
-            logger.info(`|  ${image}                                      `, false);
-        });
-        logger.info(`+------------------------------------+`, false);
+export async function analyze() {
+    await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
 
-        if(obj.invalid.length == 0) {
-            logger.info(`|           successfully             |`, false);
-            logger.info(`+------------------------------------+`, false);
-        }else {
-            logger.info(`|       * Invalid Images: ${obj.invalid.length} *     `, false);
-            obj.invalid.forEach(image => {
-                logger.info(`|  ${image}                                      `, false);
-            });
-            logger.info(`+------------------------------------+`, false);
-            logger.info(`|               Erro                 |`, false);
-            logger.info(`+------------------------------------+`, false);
-            logger.info(`| Warning: Invalid image detected. Please check.|`, false);
-        }
-        logger.info(`\n`, false);
-    } catch (e: any) {
-        logger.error(e.message);
+    let mdFilePath = getMdPath();
+    if (!mdFilePath) {
+        vscode.window.showErrorMessage('No file path found for the active document.');
+        return;
     }
+    // 打开新位置的文件
+    await   openAndEditMarkdownFile(mdFilePath);
+                
+
+    // 保存当前标签页
+    let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
+    if(docTextEditor == null) { return; }
+    await docTextEditor.document.save();
+
+    
+    showStatus(docTextEditor);
 }
 
 
@@ -311,7 +292,9 @@ export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
         logger.info(`|       * Local Images: ${obj.local.length} *     `, false);
         
         obj.local.forEach(image => {
-            logger.info(`|  ${image}                                      `, false);
+            let oriImageFlepath = obj.mapping[image] ;
+            logger.info(`|      ${oriImageFlepath}                       `, false);
+            // logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
         });
         logger.info(`+------------------------------------+`, false);
         logger.info(`|       * Network Images: ${obj.net.length} *     `, false);
@@ -1126,24 +1109,25 @@ export async function convertSelectUrl(selectFlag:boolean= true){
     let uniArr:string[] = Array.from(set) as string[];
     let count=0,len = uniArr.length;
     for(let file of uniArr)
+    {
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+        logger.info(`[${file}] move to [${imageFile}], ${count+1}/${len}`,false);
+        try{
+
+            let b = escapeStringRegexp(fileMapping[file]);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            //转为相对路径
+            content =  content.replace(reg,'![$1]('+ convertAbOrRelative(fileMapping[file]) +')'); // 内容替换
+            count++;
+        }catch(e)
         {
-            // 转移到目标路径 
-            let imageFile = path.parse(file);
-            logger.info(`[${file}] move to [${imageFile}], ${count+1}/${len}`,false);
-            try{
-    
-                let b = escapeStringRegexp(fileMapping[file]);
-                var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
-                //转为相对路径
-                content =  content.replace(reg,'![$1]('+ convertAbOrRelative(fileMapping[file]) +')'); // 内容替换
-                count++;
-            }catch(e)
-            {
-                logger.error('convert error:');
-                console.log(e);
-            }
+            logger.error('convert error:');
+            console.log(e);
         }
-        await saveFile(content,count,selectFlag);
+    }
+    await saveFile(content,count,selectFlag);
+
 }
 // 初始化参数，参数保存于 common模块中
 export function initPara() {

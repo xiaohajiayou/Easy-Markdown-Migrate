@@ -151,6 +151,10 @@
           "group": "2_workspace@3"
         },
         {
+          "command": "easy-markdown-migrate.deleteImage",
+          "group": "2_workspace@4"
+        },
+        {
           "command": "easy-markdown-migrate.upload",
           "group": "3_workspace@1"
         },
@@ -167,12 +171,8 @@
           "group": "4_workspace@2"
         },
         {
-          "command": "easy-markdown-migrate.deleteImage",
-          "group": "5_workspace@1"
-        },
-        {
           "command": "easy-markdown-migrate.drop",
-          "group": "5_workspace@2"
+          "group": "5_workspace@1"
         }
       ]
     },
