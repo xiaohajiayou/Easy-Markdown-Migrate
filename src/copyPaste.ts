@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
 import { getLang } from './lib/lang';
-import {copyContent,cutContent,pasteContent,migrateFile,analyze,showStatus,openAndEditMarkdownFile,suspendedLogMsg,logger,migrateImg} from './utils'
+import {copyContent,cutContent,pasteContent,analyze,suspendedLogMsg} from './utils'
 
 
 export async function vscCopy() {
@@ -23,7 +23,7 @@ export async function vscCut() {
 
 export async function vscPaste() {
     await pasteContent(true);
-    analyze();
+    await analyze();
     suspendedLogMsg();
 }
 

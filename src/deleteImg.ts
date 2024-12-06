@@ -44,6 +44,6 @@ export async function vscDeleteImgs(flag:boolean=false) {
 
     // await migrateImg(recycleImgPath,true);
     // cleanMD(flag);
-    cleanWithSelectedLinks(recycleImgPath);
+    await cleanWithSelectedLinks(recycleImgPath);
     suspendedLogMsg();
 }

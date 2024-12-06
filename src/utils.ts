@@ -235,17 +235,6 @@ export function clearMsg() {
 }
 
 export async function analyze() {
-    await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
-
-    let mdFilePath = getMdPath();
-    if (!mdFilePath) {
-        vscode.window.showErrorMessage('No file path found for the active document.');
-        return;
-    }
-    // 打开新位置的文件
-    await   openAndEditMarkdownFile(mdFilePath);
-                
-
     // 保存当前标签页
     let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
     if(docTextEditor == null) { return; }
@@ -441,7 +430,7 @@ export async function migrateImg(imageTargetFolder:string,selectFlag:boolean= fa
     }
     let fileArr = fileObj.local; // 本地文件上传
     let fileMapping = fileObj.mapping; // 本地原始信息
-    let content = fileObj.content;
+    let content = fileObj.content; 
 
     //downThread = thread;
     // 对网络图片去重，不必每次下载
@@ -515,7 +504,7 @@ export async function migrateFile(localFolder: string) {
         // 保存当前标签页
         let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
         if(docTextEditor == null) { return; }
-        await docTextEditor.document.save();
+        // await docTextEditor.document.save();
 
         showStatus(docTextEditor);
         if(!openAfterMigrate) {
@@ -1127,8 +1116,11 @@ export async function convertSelectUrl(selectFlag:boolean= true){
         }
     }
     await saveFile(content,count,selectFlag);
+    let b;
 
 }
+
+
 // 初始化参数，参数保存于 common模块中
 export function initPara() {
     clearMsg();

@@ -24,6 +24,6 @@ export async function vscMove() {
     let localFolder: string = result[0].fsPath;
     console.log(`Will Move images to localFolder[${localFolder}]`)                            
     await moveImg(localFolder,true);
-    analyze();
+    await analyze();
     suspendedLogMsg();
 }

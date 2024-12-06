@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
 import { getLang } from './lib/lang';
-import {migrateFile,analyze,showStatus,openAndEditMarkdownFile,suspendedLogMsg,logger,migrateImg} from './utils'
+import {migrateFile,suspendedLogMsg,migrateImg} from './utils'
 
 
 export async function vscMigrate() {

@@ -382,9 +382,12 @@ export async function saveFile(content: string, count: number, selectFlag: boole
                 const end = new vscode.Position(textEditor?.document.lineCount || 0 + 1, 0);
                 rang = new vscode.Range(new vscode.Position(0, 0), end)
             }
+            vscode.window.showTextDocument(textEditor.document)
             editBuilder.replace(rang, content);
         });
         await textEditor.document.save();
+        await vscode.window.showTextDocument(textEditor.document)
+        
     }
 
     logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
