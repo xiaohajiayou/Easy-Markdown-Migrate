@@ -3,13 +3,12 @@
 
     "easy-markdown-migrate.menuAnalyze": "Analyze Image Links",
     "easy-markdown-migrate.menuMigrate": "Migrate Markdown File",
-    "easy-markdown-migrate.menuCopy": "Copy With Content",
-    "easy-markdown-migrate.menuCut": "Cut With Content",
-    "easy-markdown-migrate.menuPaste": "Paste With Content",
+    "easy-markdown-migrate.menuCopy": "Copy With Images",
+    "easy-markdown-migrate.menuCut": "Cut With Images",
+    "easy-markdown-migrate.menuPaste": "Paste With Images",
 
     "easy-markdown-migrate.menuDownload": "Download Images",
     "easy-markdown-migrate.menuUpload": "Upload Images",
-    "easy-markdown-migrate.menuMoveImage": " Move  Select Images",
     "easy-markdown-migrate.menuMoveImage": " Move  Select Images",
     "easy-markdown-migrate.menuConvert": " Absolute<->Relative",
 
@@ -20,12 +19,21 @@
 
 
     "easy-markdown-migrate.openAfterMigrate": "The markdown file which has been migrateed will be opened automatically",
-    "easy-markdown-migrate.imageSaveFolder": "Local folder which the images will save to, support absolute or relative path. support <images>、<filename> and date format<YYYYMMDD> variable (dayjs)",
+    "easy-markdown-migrate.imageSaveFolder": "Local folder which the downloaded images will save to, support absolute or relative path. support <images>、<filename> and date format<YYYYMMDD> variable (dayjs)",
     "easy-markdown-migrate.updateLink": "Whether update the picture link in md file(Clean,Download,Upload,Move)",
     "easy-markdown-migrate.skipSelectChange": "Whether still update picture link when selection/position changed",
-    "easy-markdown-migrate.rename": "Whether rename the image files(Download,Upload,Move)",
+    "easy-markdown-migrate.rename": "Whether rename the image files when migrate ",
     "easy-markdown-migrate.remotePath": "Which be added at beginning of PicBed path, support <filename> and date format<YYYYMMDD> variable (dayjs)",
     "easy-markdown-migrate.downloadTimeout": "Timeout seconds for download each image",
     "easy-markdown-migrate.uploadTimeout": "Timeout seconds for upload each image",
-    "easy-markdown-migrate.urlFormatted": "Whether escape image URL when insert local image"
+    "easy-markdown-migrate.urlFormatted": "Whether escape image URL when insert local image",
+    "easy-markdown-migrate.hasBracket": "Whether the image path include right bracket",
+
+    "picgo.uploader":  "The uploader to be used by PicGo, default is 'github'",
+    "picgo.repo": "GitHub repository for image hosting , support <username>/<repo>",
+    "picgo.token": "GitHub personal access token.",
+    "picgo.branch": "Branch of the GitHub repository, default is 'main'",
+    "picgo.path": "Path for images within the repository, default is 'test/'",
+    "picgo.customUrl": "Custom URL for images."
+
 } 

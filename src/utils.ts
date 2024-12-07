@@ -662,6 +662,7 @@ export async function vscDownload() {
 
 export async function upCheck() {
     try {
+        logger.info(`start to init imagebed moudle , please wait.`, false,true);
         const { PicGo } = require('picgo');
         myPicgo = PicGo;
     } catch (e) {
@@ -672,7 +673,7 @@ export async function upCheck() {
         // }else{
         //     logger.error(getLang('picgofail'))
         // }
-        logger.error('PicGo init error:');
+        logger.error('PicGo moudle init error:');
         console.log(e);
         return false;
     }
@@ -681,10 +682,69 @@ export async function upCheck() {
     remote = convertPath(remotePath)
     return true;
 }
+function getPicgoConfig():string | undefined {
+    const config = vscode.workspace.getConfiguration('picgo');
+    const picgoConfig = {
+        picBed: {
+          uploader: config.get<string>('uploader'),
+          current: config.get<string>('uploader'),
+          github: {
+             repo: config.get<string>('repo'),
+             branch: config.get<string>('branch'),
+             token: config.get<string>('token'),
+             path: config.get<string>('path'),
+             customUrl: config.get<string>('customUrl')
+          }
+        },
+        picgoPlugins: {}
+     };
+         // 将配置对象写入 JSON 
 
+     let mdOriginFilePath = getOriginMdPath();
+     if (!mdOriginFilePath) {
+         vscode.window.showErrorMessage('No file path found for the active document.');
+         return;
+     }
+     // 获取 VSCode 窗口的根目录路径
+         // 获取工作区的根路径
+     let rootPath: string ;
+     const workspaceFolders = vscode.workspace.workspaceFolders;
+     if (workspaceFolders) {
+         // 通常，我们取第一个工作区根路径作为当前文件所属的工作区
+         rootPath = workspaceFolders[0].uri.fsPath;
+         // 确保当前文件确实在工作区内
+         if (!mdOriginFilePath.startsWith(rootPath)) {
+             return undefined;
+         }
+     }else {
+         return undefined;
+     }
+         // 构建 .recycle 目录路径
+     let imageBedConfig = path.join(rootPath, '.picgo'); 
+         // 检查 .recycle/images 文件夹是否存在，不存在则创建
+     if (!fs.existsSync(imageBedConfig)) {
+         try {
+             fs.mkdirSync(imageBedConfig, { recursive: true });
+             console.log(`Created directory: ${imageBedConfig}`);
+         } catch (error) {
+             console.error(`Failed to create directory: ${imageBedConfig}`, error);
+             vscode.window.showErrorMessage(`Failed to create .recycle directory: ${error}`);
+             return undefined;
+         }
+     }
+     const picgoConfigPath = path.join(imageBedConfig, 'picgoConfig.json');
+     fs.writeFileSync(picgoConfigPath, JSON.stringify(picgoConfig, null, 4));
+     return picgoConfigPath;
+}
 export async function upload(clipBoard: boolean = false) // ,thread:number
 {
-    const picgo1 = new myPicgo(); // 将使用默认的配置文件：~/.picgo/config.json
+    let picgoConfigPath = getPicgoConfig();
+    if(picgoConfigPath == undefined) {
+        logger.info(`picgo config error ! please check.`, true,true);
+        return;
+    }
+    const picgo1 = new myPicgo(picgoConfigPath); // 将使用默认的配置文件：~/.picgo/config.json
+    // const picgo1 = new myPicgo(); // 将使用默认的配置文件：~/.picgo/config.json
     picgo1.on('beforeUpload', (ctx: any) => {
         let fileName = ctx.output[0].fileName;
         let upFile = path.parse(fileName);
@@ -714,7 +774,7 @@ export async function upload(clipBoard: boolean = false) // ,thread:number
             return;
         }
     }
-    logger.info(`Uploading image, please wait.`, true,true);
+    logger.info(`Uploading image, please stay focus and do not leave !`, true,true);
     
     //downThread = thread;
     // 对网络图片去重，不必每次下载
