@@ -366,7 +366,7 @@ export async function saveFile(content: string, count: number, selectFlag: boole
         return;
     }
     let textEditor = await checkEditor(false)
-    if (textEditor == null) { return; }
+    if (textEditor == undefined) { return; }
     if ((content.length > 0||cleanFlag) && textEditor != null) {
         await textEditor.edit((editBuilder: vscode.TextEditorEdit) => {
             let rang: vscode.Range;

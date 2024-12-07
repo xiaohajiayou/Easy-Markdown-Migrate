@@ -181,23 +181,21 @@
       "properties": {
         "easy-markdown-migrate.openAfterMigrate": {
           "type": "boolean",
-          "default": false,
-          "description": "%easy-markdown-migrate.openAfterMigrate%"
+          "default": true,
+          "description": "%easy-markdown-migrate.openAfterMigrate%",
+          "order": 1
         },
-        "easy-markdown-migrate.hasBracket": {
-          "type": "string",
-          "default": "auto",
-          "enum": [
-            "auto",
-            "yes",
-            "no"
-          ],
-          "description": "%easy-markdown-migrate.hasBracket%"
+        "easy-markdown-migrate.rename": {
+          "type": "boolean",
+          "default": true,
+          "description": "%easy-markdown-migrate.rename%",
+          "order": 2
         },
         "easy-markdown-migrate.imageSaveFolder": {
           "type": "string",
           "default": "images",
-          "description": "%easy-markdown-migrate.imageSaveFolder%"
+          "description": "%easy-markdown-migrate.imageSaveFolder%",
+          "order": 3
         },
         "easy-markdown-migrate.updateLink": {
           "type": "boolean",
@@ -209,30 +207,72 @@
           "default": false,
           "description": "%easy-markdown-migrate.skipSelectChange%"
         },
-        "easy-markdown-migrate.rename": {
-          "type": "boolean",
-          "default": true,
-          "description": "%easy-markdown-migrate.rename%"
-        },
-        "easy-markdown-migrate.remotePath": {
-          "type": "string",
-          "default": "<filename>",
-          "description": "%easy-markdown-migrate.remotePath%"
-        },
-        "easy-markdown-migrate.timeoutDownload": {
-          "type": "number",
-          "default": 10,
-          "description": "%easy-markdown-migrate.downloadTimeout%"
-        },
-        "easy-markdown-migrate.timeoutUpload": {
-          "type": "number",
-          "default": 10,
-          "description": "%easy-markdown-migrate.uploadTimeout%"
-        },
         "easy-markdown-migrate.urlFormatted": {
           "type": "boolean",
           "default": true,
           "description": "%easy-markdown-migrate.urlFormatted%"
+        },
+        "easy-markdown-migrate.hasBracket": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "yes",
+            "no"
+          ],
+          "description": "%easy-markdown-migrate.hasBracket%"
+        },
+        "easy-markdown-migrate.remotePath": {
+          "type": "string",
+          "default": "<filename>",
+          "description": "%easy-markdown-migrate.remotePath%",
+          "order": 4
+        },
+        "easy-markdown-migrate.timeoutDownload": {
+          "type": "number",
+          "default": 20,
+          "description": "%easy-markdown-migrate.downloadTimeout%"
+        },
+        "easy-markdown-migrate.timeoutUpload": {
+          "type": "number",
+          "default": 20,
+          "description": "%easy-markdown-migrate.uploadTimeout%"
+        },
+        "picgo.uploader": {
+          "type": "string",
+          "default": "github",
+          "description": "%picgo.uploader%",
+          "order": 5
+        },
+        "picgo.repo": {
+          "type": "string",
+          "default": "",
+          "description": "%picgo.repo%",
+          "order": 6
+        },
+        "picgo.token": {
+          "type": "string",
+          "default": "",
+          "description": "%picgo.token%",
+          "order": 7
+        },
+        "picgo.branch": {
+          "type": "string",
+          "default": "main",
+          "description": "%picgo.branch%",
+          "order": 8
+        },
+        "picgo.path": {
+          "type": "string",
+          "default": "test/",
+          "description": "%picgo.path%",
+          "order": 9
+        },
+        "picgo.customUrl": {
+          "type": "string",
+          "default": "",
+          "description": "%picgo.customUrl%",
+          "order": 10
         }
       }
     }
@@ -250,16 +290,17 @@
   "keywords": [
     "markdown",
     "image",
-    "manage",
+    "migrate",
     "picture",
     "analyze",
     "download",
     "upload",
-    "move file",
-    "clean",
+    "copy",
+    "markdown-image",
     "covert",
     "paste",
-    "clipboard",
+    "move-markdown",
+    "transfer",
     "picgo",
     "pic bed"
   ],
