@@ -1,114 +1,110 @@
-<div align="center" style="font-size: 1em;"><h1><strong>Easy Markdown Migrate</strong></h1></div>  
-<div align="center" ><h5><strong>中文</strong> | <a href="https://github.com/xiaohajiayou/Easy-Markdown-Migrate/blob/main/README_en.md"><strong>English</strong></a><h5></div>   
-<p align="center" >  
-  <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com" alt="Description">  
-  <img src="https://img.shields.io/github/license/xiaohajiayou/Easy-Markdown-Migrate" alt="Description">  
-  <img src="https://img.shields.io/visual-studio-marketplace/stars/Hacode.easy-markdown-migrate?color=%23FFA500%20" alt="Description">  
-</p>  
 
+<div align="center" style="font-size: 1em;"><h1><strong>Easy Markdown Migrate</strong></h1></div>
+<div align="center" ><h5><strong>中文</strong>| <a href="https://gitee.com/lilhah/easy-markdown-migrate"><strong>Gitee</strong> </a><h5></div>   
 
+<p align="center" style="margin-top: 10px;">
+  <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg?style=flat-square)](https://standardjs.com" alt="Description">
+  <img src="https://img.shields.io/github/license/xiaohajiayou/Easy-Markdown-Migrate" alt="Description">
+  <img src="https://img.shields.io/visual-studio-marketplace/stars/Hacode.easy-markdown-migrate?color=%23FFA500%20" alt="Description">
+</p>
 
-  
+**Easy Markdown Migrate** is a plugin designed for Markdown file migration, achieving binding between files and the images behind their links, helping users easily move, delete, copy, and paste files or content, making local management and image bed backup simpler.  
 
+### Project Introduction  
 
+With this plugin, users only need to focus on writing documents. The plugin will automatically recognize the image links in the files and match them with the underlying images, achieving quick classification and movement of files and images. You simply need to use the shortcut keys for `migrate file` or `Copy With Content`, `Paste With Content` to move files and images to the desired location, greatly improving document management efficiency.  
 
-**Easy Markdown Migrate** 是一个针对`Markdown`文件迁移而设计的插件，实现文件与链接背后的图片绑定，帮助用户轻松地移动、删除、复制、粘贴文件或内容，让本地管理和图床备份变得更简单。
+In addition, Easy Markdown Migrate also provides functions such as image bed upload, image download, image movement, and image deletion. These functions can help developers publish local files as blog posts; they can also achieve network image backup. All these operations automatically maintain the relationship between images and files, ensuring the correctness of image links.  
 
+Our goal is to make Markdown document management not only efficient but also more beginner-friendly. Even beginners who have never used Markdown can put all files and images in the root directory and then use Easy Markdown Migrate to achieve reliable migration management.  
 
-项目简介
----------------
-通过这个插件，用户只需专注于撰写文档，插件会自动识别文件中的图片链接，并将其与背后图片匹配，实现文件与图片的快速分类和移动。您只需要简单的通过快捷键使用`migrate file` 或`Copy With Content`、`Paste With Content` ，即可将文件与图片迁移到你所需的位置，极大地提高了文档管理的效率。
+### Main Features  
 
-此外，Easy Markdown Migrate 还提供了图床上传、图片下载、图片移动、图片删除等功能，这些内容可以帮助开发者将本地文件发布为博客；也可以实现网络图片备份。这些操作都自动维护图片与文件的关系，保证图片链接的正确性。
+*   **Local Migration**:  
+    
+    1.  When you need to move a specified file, it supports one-click `migration` of md files and their affiliated images to the target location.  
+    2.  When you need to move specified content (including `image URLs`), it supports one-click `copy/cut/paste`.  
+    3.  When you need to delete a specified file, it supports one-click `discard` of md files and their affiliated images to the `.recycle` folder.  
+    4.  When you need to delete specified content (including `image URLs`), it supports one-click `deletion` of content and moves affiliated images to the `.recycle/images` folder.  
+*   **Image Bed Migration**:  
+    
+    1.  When you need to publish a specified file as a blog post, it supports one-click upload of images to the image bed and generates an `online` version of the file, where the `url` is replaced with the image bed link.    
+    2.  When you need to back up network resources, it supports one-click download of images to the `./images` folder and automatically replaces them with local links.  
+*   **Image Management**:
+    1.  When you need to check the image status, there is no need to open a renderer; it supports one-click `analysis` of the current image resources.  
+    2.  When you need to move affiliated images to a specified file only, it supports one-click `migration` of affiliated images to the target location.  
+    3.  When you need to convert the image `URL` format, it supports one-click relative/absolute path `conversion`.   
 
-我们的目标是让`Markdown`文档管理不仅高效，而且更加小白友好。即使是从未使用过`Markdown`的新手，甚至可以将所有文件和图片放在根目录，然后通过`Easy Markdown Migrate`实现可靠的迁移管理。  
+### How to Install
 
-主要特性  
----------------
-- 本地迁移：  
-1、当需要移动指定文件时，支持一键`迁移`md文件及其附属图片至目标位置。     
-2、当需要移动指定内容（包含`图片URL`）时，支持一键`复制/剪切/粘贴`。     
-3、当需要删除指定文件时，支持一键`丢弃`md文件及其附属图片至`.recycle`文件夹。     
-4、当需要删除指定内容（包含`图片URL`）时，支持一键`删除`内容，并移动附属图片到`.recycle/images`文件夹。     
+Through the [Plugin Marketplace](https://marketplace.visualstudio.com/vscode) or by searching within VSCode, install the plugin to use all local management features.     
+![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/en_migrate-read-me/image-13.png)  
+If you need to use image bed upload, complete the [image bed configuration](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki) to use.    
 
+### How to Use
 
+**The plugin provides two ways to use: menu and common shortcut keys, as follows:** After opening a Markdown file, right-click on the edit page to display the menu as follows:   
 
-- 图床迁移：  
-1、当需要发布指定文件为博客时，支持一键上传图片到图床，并生成`online`版副本文件，其中`url`被替换为图床链接。     
-2、当需要备份网络资源时，支持一键下载图片到`./images`文件夹，并自动替换为本地链接。     
+![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/image-14.png)  
+Function descriptions are as follows:  
 
-- 图片管理：  
-1、当需要查看图片情况时，无需打开渲染器，支持一键`分析`当前图片资源。    
-2、当需要仅移动附属图片到指定文件时，支持一键`迁移`附属图片至目标位置。       
-3、当需要转换图片`URL`格式时，支持一键相对/绝对路径`转换`。       
+*   Analyze the image links of the current file: `Analyze Image Links`  
+    
+    *   Shortcut key: `Ctrl` + `Shift` + `A`
+    
+![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/analyse.gif)       
+    
+*   Move the current file and images to another directory (automatically update image links): `Migrate Markdown File`  
+    
+    *   Shortcut key: `Ctrl` + `Shift` + `M`  
+    
+![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/migrate.gif)    
+    
+*   Copy/cut selected content (including images) in the current file to another directory's file:  
+    
+    *   Copy selected content: `Copy With Content`  
+        *   Shortcut key: `Ctrl` + `Shift` + `C`  
+    *   Cut selected content: `Cut With Content`  
+        *   Shortcut key: `Ctrl` + `Shift` + `X`  
+    *   Paste previously selected content: `Paste With Content`  
+        *   Shortcut key: `Ctrl` + `Shift` + `V`  
+    
+![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/copy.gif)    
+    
 
+*   Upload local images to the image bed (automatically generate an image bed version file): `Upload Images`  
+*   Download remote images to local backup (automatically update to local image links): `Download Images`  
 
+*   Select image links in the file to move images to another directory (automatically update links): `Move Select Images`  
+*   Insert images from the local directory and convert to relative paths with one click: `Absolute<->Relative`  
 
-如何安装
----------------
-通过[插件市场](https://marketplace.visualstudio.com/vscode)或vscode内搜索的方式，安装插件即可使用本地管理所有功能。   
-![alt text](https://s2.loli.net/2024/12/09/FubaJ91Ior5H7Xt.png)  
-如需要使用图床上传，完成[图床配置](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki)即可使用。  
+*   Select image links in the file to discard images to the trash (automatically clear links): `Delete With Images`  
+*   Delete the current file to discard files and images to the trash (automatically update links): `Drop File to Trash`  
 
-
-如何使用
----------------
-**本插件提供菜单和常用快捷键两种使用方式，具体如下：**    
-打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://s2.loli.net/2024/12/09/YiRJwI6VTue5gbC.png)  
-功能描述如下：    
-- 分析当前文件的图片链接:  `Analyze Image Links`  
-  - 快捷键：`Ctrl` + `Shift` + `A`   
-  
-![alt text](https://s2.loli.net/2024/12/09/LYmVUzAJj4vc87k.gif)    
-- 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `Migrate Markdown File`  
-  - 快捷键：`Ctrl` + `Shift` + `M`  
-  
-![alt text](https://s2.loli.net/2024/12/09/P9XEhwRUTyn1biJ.gif)        
-- 复制/剪切当前文件内选中内容（包括图片） --> 另外的目录下的文件内 :  
-  - 复制所选择的内容:  `Copy With Content`    
-    - 快捷键：`Ctrl` + `Shift` + `C`   
-  - 剪切所选择的内容:  `Cut With Content`    
-    - 快捷键：`Ctrl` + `Shift` + `X`   
-  - 粘贴之前选择的内容:  `Paste With Content`    
-    - 快捷键：`Ctrl` + `Shift` + `V`   
-
-+ 上传本地图片 --> 图床（自动生成图床版文件） ：`Upload Images`    
-+ 下载远程图片 --> 本地备份 （自动更新为本地图片链接）：`Download Images`    
-- 选择文件内图片链接 --> 移动图片到另外的目录（自动更新链接） ：`Move Select Images`  
-- 插入本地目录下的图片 --> 一键转换为相对路径 ：`Absolute<->Relative`    
-+ 选择文件内的图片链接 --> 丢弃图片到垃圾桶（自动清除链接） ：`Delete With Images`  
-+ 删除当前文件 --> 丢弃文件与图片到垃圾桶（自动更新链接） ：`Drop File to Trash`    
-
-具体使用方法及详细使用案例，请参考[插件使用文档](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki)。
-
-
-
-* * *
-
-
-
-**自定义快捷键：** 如果您需要更改这些快捷键，可以在VSCode的快捷键设置中进行自定义。  
-*   打开VSCode设置（`Ctrl` + `,` 或 `Cmd` + `,`）。  
-*   搜索“Keyboard Shortcuts”。  
-*   找到 `easy-markdown-migrate.deleteImage` 命令。  
-*   点击快捷键字段，然后按下您希望设置的新快捷键组合。  
-
-**注意：**  
-
-*   所有快捷键均在编辑器文本域有焦点时有效（`editorTextFocus`）。  
-*   在执行复制、剪切或粘贴操作前，请确保您已经选中了需要操作的内容。 
-*   复制剪切内容暂存于当前vscode编辑器中，无法跨vscode window执行粘贴操作  
-*   迁移文件操作会移动文件和图片，请确保目标位置正确，以避免数据混乱。  
-*   **插件不会删除资源，删除内容都在项目根路径`.recycle`文件中**。  
+For specific usage methods and detailed usage cases, please refer to the [plugin usage document](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki).  
 
 * * *
 
-这个插件旨在减少撰写文档的成本，同时也让撰写随笔文档的过程更加轻松。无论您是正在学习的新手还是希望提高管理效率的开发者，Easy Markdown Migrate 都是您的理想选择。  
+**Customize Shortcut Keys:** If you need to change these shortcut keys, you can customize them in the VSCode shortcut key settings.  
 
+*   Open VSCode settings (`Ctrl` + `,` or `Cmd` + `,`).
+*   Search for "Keyboard Shortcuts".
+*   Find the `easy-markdown-migrate.deleteImage` command.
+*   Click the shortcut key field, then press the new shortcut key combination you wish to set.
 
+**Note:**
 
+*   All shortcut keys are effective when the editor text field has focus (`editorTextFocus`).
+*   Before performing copy, cut, or paste operations, please ensure you have selected the content you need to operate on.
+*   Copied and cut content is temporarily stored in the current VSCode editor and cannot be pasted across VSCode windows.
+*   File migration operations will move files and images, please ensure the target location is correct to avoid data confusion.
+*   **The plugin does not delete resources, deleted content is in the `.recycle` file at the project root path**.
 
-仓库地址  
----------------
-https://github.com/xiaohajiayou/Easy-Markdown-Migrate  
-欢迎使用！issue 反馈和contribute 贡献都非常欢迎。如果该插件解决了您的需求，请帮忙点上一个star，十分感谢！  
+* * *
+
+This plugin aims to reduce the cost of writing documents and also make the process of writing essays more relaxed. Whether you are a beginner who is learning or a developer who wants to improve management efficiency, Easy Markdown Migrate is your ideal choice.
+
+### Repository Address
+
+https://github.com/xiaohajiayou/Easy-Markdown-Migrate    
+Welcome to use it! Feedback and contributions are very welcome. If this plugin solves your needs, please help to star it, thank you very much!  
