@@ -47,7 +47,7 @@
 如何安装
 ---------------
 通过[插件市场](https://marketplace.visualstudio.com/vscode)或vscode内搜索的方式，安装插件即可使用本地管理所有功能。   
-![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/migrate_read_me%2Fimage-13.png)  
+![alt text](https://s2.loli.net/2024/12/09/FubaJ91Ior5H7Xt.png)  
 如需要使用图床上传，完成[图床配置](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki)即可使用。  
 
 
