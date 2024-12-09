@@ -54,16 +54,16 @@
 如何使用
 ---------------
 **本插件提供菜单和常用快捷键两种使用方式，具体如下：**    
-打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/image-14.png)  
+打开Markdown文件后，在编辑页面右键出现菜单如下：![alt text](https://s2.loli.net/2024/12/09/YiRJwI6VTue5gbC.png)  
 功能描述如下：    
 - 分析当前文件的图片链接:  `Analyze Image Links`  
   - 快捷键：`Ctrl` + `Shift` + `A`   
   
-![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/analyse.gif)    
+![alt text](https://s2.loli.net/2024/12/09/LYmVUzAJj4vc87k.gif)    
 - 移动当前文件和图片 --> 另外的目录（自动更新图片链接） :  `Migrate Markdown File`  
   - 快捷键：`Ctrl` + `Shift` + `M`  
   
-![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/migrate.gif)        
+![alt text](https://s2.loli.net/2024/12/09/P9XEhwRUTyn1biJ.gif)        
 - 复制/剪切当前文件内选中内容（包括图片） --> 另外的目录下的文件内 :  
   - 复制所选择的内容:  `Copy With Content`    
     - 快捷键：`Ctrl` + `Shift` + `C`   
@@ -71,8 +71,6 @@
     - 快捷键：`Ctrl` + `Shift` + `X`   
   - 粘贴之前选择的内容:  `Paste With Content`    
     - 快捷键：`Ctrl` + `Shift` + `V`   
-
-![alt text](https://raw.githubusercontent.com/xiaohajiayou/imagesBed/main/test/easy-markdown-migrate/copy.gif)   
 
 + 上传本地图片 --> 图床（自动生成图床版文件） ：`Upload Images`    
 + 下载远程图片 --> 本地备份 （自动更新为本地图片链接）：`Download Images`    
