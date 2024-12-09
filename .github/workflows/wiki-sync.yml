@@ -1,0 +1,39 @@
+name: Sync Wiki to Gitee
+
+on:
+  repository_dispatch:
+    types: [wiki_updated]
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Wiki
+      run: |
+        git clone https://github.com/${{ github.repository }}.wiki.git wiki
+
+    - name: Set up Git
+      run: |
+        git config --global user.email "18512872230@163.com"
+        git config --global user.name "xiaohajiayou"
+
+    - name: Add Gitee Wiki remote
+      run: |
+        cd wiki
+        git remote add gitee-wiki https://lilhah:${{ secrets.GITEE_TOKEN }}@gitee.com/lilhah/easy-markdown-migrate.wiki.git
+
+    - name: Fetch all Wiki remotes
+      run: |
+        cd wiki
+        git fetch --all
+
+    - name: Reset Wiki Git repository
+      run: |
+        cd wiki
+        git reset --hard origin/master
+        git clean -fd
+
+    - name: Push Wiki to Gitee
+      run: |
+        cd wiki
+        git push gitee-wiki HEAD:master --force

@@ -684,20 +684,34 @@ export async function upCheck() {
 }
 function getPicgoConfig():string | undefined {
     const config = vscode.workspace.getConfiguration('picgo');
-    const picgoConfig = {
-        picBed: {
-          uploader: config.get<string>('uploader'),
-          current: config.get<string>('uploader'),
-          github: {
-             repo: config.get<string>('repo'),
-             branch: config.get<string>('branch'),
-             token: config.get<string>('token'),
-             path: config.get<string>('path'),
-             customUrl: config.get<string>('customUrl')
-          }
-        },
-        picgoPlugins: {}
-     };
+    let picgoConfig ;
+    if(config.get<string>('uploader') == 'github') {
+        picgoConfig = {
+            picBed: {
+              uploader: config.get<string>('uploader'),
+              current: config.get<string>('uploader'),
+              github: {
+                 repo: config.get<string>('repo'),
+                 branch: config.get<string>('branch'),
+                 token: config.get<string>('token'),
+                 path: config.get<string>('path'),
+                 customUrl: config.get<string>('customUrl')
+              }
+            },
+            picgoPlugins: {}
+         };
+    } else if(config.get<string>('uploader') == 'smms'){
+        picgoConfig = {
+            picBed: {
+              uploader: config.get<string>('uploader'),
+              smms: {
+                 token: config.get<string>('token'),
+              }
+            },
+            picgoPlugins: {}
+         };
+    }
+
          // 将配置对象写入 JSON 
 
      let mdOriginFilePath = getOriginMdPath();
