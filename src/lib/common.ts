@@ -390,6 +390,7 @@ export async function saveFile(content: string, count: number, selectFlag: boole
         
     }
 
+    
     logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
 }
 // 获取本地有效的文件名

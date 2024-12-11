@@ -72,6 +72,7 @@
   - 粘贴之前选择的内容:  `Paste With Content`    
     - 快捷键：`Ctrl` + `Shift` + `V`   
 
+![alt text](https://s2.loli.net/2024/12/12/9LQPcKSJ1I8Vlms.gif)  
 + 上传本地图片 --> 图床（自动生成图床版文件） ：`Upload Images`    
 + 下载远程图片 --> 本地备份 （自动更新为本地图片链接）：`Download Images`    
 - 选择文件内图片链接 --> 移动图片到另外的目录（自动更新链接） ：`Move Select Images`  
