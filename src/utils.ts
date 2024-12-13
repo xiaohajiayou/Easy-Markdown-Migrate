@@ -1,12 +1,13 @@
 import {remotePath, rename,newName, saveFile, getValidFileName,getMdPath,
     getMdEditor,getImages,mdCheck,setPara,escapeStringRegexp, 
-    switchPath,urlFormatted,myEncodeURI,insertText,ulTimeout,timeoutPromise,convertPath} from './lib/common';
+    switchPath,urlFormatted,myEncodeURI,insertText,ulTimeout,timeoutPromise,convertPath,
+    localFolder, getAutoPath, localCheck,dlTimeout} from './lib/common';
 
-
-import { download } from './lib/download';
 import { getLang } from './lib/lang';
+import downloadCore from "./lib/downloadcore.js";
 import { window, ProgressLocation } from 'vscode'
-
+import { exec, execSync } from 'child_process';
+import { existsSync } from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -59,7 +60,7 @@ let docPreSelectionAfterRename: vscode.Selection | undefined; // 选择的范围
 
 let mdFileAfterCopy = ''; // 需要处理的文件
 let oMdFileAfterCopy: path.ParsedPath; // mdFile的对象结构
-let docTextEditorAfterCopy: vscode.TextEditor | undefined; // 选择的MD文件
+let docTextEditorAfterNewFile: vscode.TextEditor | undefined; // 选择的MD文件
 let docPreSelectionAfterCopy: vscode.Selection | undefined; // 选择的范围
 
 // save images obj for paste
@@ -74,7 +75,7 @@ let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会�
 
 
 export async function copyContent(selectFlag:boolean= true) {
-    cutFileObj = undefined
+    cutFileObj = undefined;
     let fileObj = getImages(selectFlag);
     if(fileObj.content == '')
         {
@@ -113,16 +114,15 @@ export async function copyContent(selectFlag:boolean= true) {
     await saveFile(content,count,selectFlag);
     logger.success('copy successfully.', true);
 }
-export async function cutContent(selectFlag:boolean= true) {
-    copyFileObj!= undefined
-    let cleanFlag = true;
+export async function copyContentToClipboard(selectFlag:boolean= true) {
+    cutFileObj = undefined;
     let fileObj = getImages(selectFlag);
     if(fileObj.content == '')
         {
-            logger.error('No image cut, cannot paste.');
+            logger.error('No image copy, cannot paste.');
             return '';
         }
-    cutFileObj = fileObj;
+    copyFileObj = fileObj;
     
     let fileArr = fileObj.local; // 本地文件上传
     let fileMapping = fileObj.mapping; // 本地原始信息
@@ -136,10 +136,113 @@ export async function cutContent(selectFlag:boolean= true) {
     for(let file of uniArr)
     {
 
-        logger.info(`Image cutped : [${file}] ], ${count+1}/${len}`,false);
+        logger.info(`Image copied : [${file}] ], ${count+1}/${len}`,false);
         try{
 
             // fs.renameSync(file,newFile);
+            copyFileToClipboardCMD(file);
+            // copyFileToClipboardCMD(fileMapping[file]);
+            // copyFileToClipboardCMD(myEncodeURI(file, urlFormatted));
+            count++;
+        }catch(e)
+        {
+            logger.error('move error:');
+            console.log(e);
+        }
+    }
+}
+// 调用系统命令复制文件到系统剪贴板
+function copyFileToClipboardCMD(filePath: string) {
+
+	if (!existsSync(filePath)) {
+        console.error(`File ${filePath} does not exist`);
+        return;
+    }
+
+    const callback = (error: Error | null, stdout: string, stderr: string) => {
+        if (error) {
+			// new Notice(`Error executing command: ${error.message}`, SUCCESS_NOTICE_TIMEOUT);
+			console.error(`Error executing command: ${error.message}`);
+			return;
+        }
+    };
+
+    if (process.platform === 'darwin') {
+		// 解决方案1: 会调出Finder，产生瞬间的窗口，但是该复制操作完全是系统级别的，没有任何限制
+		execSync(`open -R "${filePath}"`);
+        execSync(`osascript -e 'tell application "System Events" to keystroke "c" using command down'`);
+        execSync(`osascript -e 'tell application "System Events" to keystroke "w" using command down'`);
+		execSync(`open -a "Obsidian.app"`);
+
+		// ----------------------------------------------
+		// 测试切换输入法方案: 模拟Shift键按下，但是失败了
+		// execSync(`osascript -e 'tell application "System Events" to key down shift'`);
+		// execSync(`osascript -e 'delay 0.05'`);
+		// execSync(`osascript -e 'tell application "System Events" to key up shift'`);
+		// ----------------------------------------------
+
+		// ----------------------------------------------
+		// 另一种解决方案，不会调出Finder，但是复制的文件无法粘贴到word或者微信中
+		// const appleScript = `
+		// 	on run args
+		// 		set the clipboard to POSIX file (first item of args)
+		// 	end
+		// 	`;
+		// exec(`osascript -e '${appleScript}' "${filePath}"`, callback);
+		// ----------------------------------------------
+
+    } else if (process.platform === 'linux') {
+		// 目前方案
+		// xclip -selection clipboard -t $(file --mime-type -b /path/to/your/file) -i /path/to/your/file
+        // exec(`xclip -selection c < ${filePath}`, callback);
+		// exec(`xclip -selection clipboard -t $(file --mime-type -b "${filePath}") -i "${filePath}"`, callback);
+    } else if (process.platform === 'win32') {
+		// 当文件路径包含 '
+		// 在PowerShell中，单引号字符串是直接的字符串，内部的单引号无法通过反斜线来转义，但是可以通过在单引号前再加一个单引号来进行转义。
+		// let safeFilePath = filePath.replace(/'/g, "''");
+        let safeFilePath = myEncodeURI(filePath, urlFormatted)
+        safeFilePath =  decodeURI(safeFilePath);
+        exec(`powershell -command "Set-Clipboard -LiteralPath '${safeFilePath}'"`);
+    }
+}
+export async function cutContent(imageTargetFolder:string,selectFlag:boolean= true) {
+    copyFileObj = undefined;
+    let cleanFlag = true;
+    let fileObj = getImages(selectFlag);
+    if(fileObj.content == '')
+    {
+        logger.error('No image cut, cannot paste.');
+        return '';
+    }
+    cutFileObj = fileObj;
+    
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content;
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set(); 
+    fileArr.forEach((item)=> set.add(item)); 
+    let uniArr:string[] = Array.from(set) as string[];
+    let count=0,len = uniArr.length;
+    for(let file of uniArr)
+    {
+        let newFileName = '';
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+
+        // 仅仅更换目录
+        newFileName = imageFile.base;
+
+        let newFile = await getValidFileName(imageTargetFolder, newFileName);
+        if (newFile == '') {
+            logger.error(`get new image file name[${newFile}] fail!`);
+            return '';
+        }
+        logger.info(`Image cutped : [${file}] ], ${count+1}/${len}`,false);
+        try{
+
+            fs.renameSync(file,newFile);
             let b = escapeStringRegexp(fileMapping[file]);
             var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
             //转为相对路径
@@ -471,6 +574,56 @@ export async function migrateImg(imageTargetFolder:string,selectFlag:boolean= fa
 }
 
 
+export async function migrateRenamedImg(imageTargetFolder:string,docTextEditor: vscode.TextEditor | undefined) // ,thread:number
+{
+
+    let fileObj = getRenamedImgs(docTextEditor);
+    if (fileObj.content == '') {
+        return '';
+    }
+    let fileArr = fileObj.local; // 本地文件上传
+    let fileMapping = fileObj.mapping; // 本地原始信息
+    let content = fileObj.content; 
+
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set();
+    fileArr.forEach((item) => set.add(item));
+    let uniArr: string[] = Array.from(set) as string[];
+    let count = 0, len = uniArr.length;
+    for (let file of uniArr) {
+        let newFileName = '';
+        // 转移到目标路径 
+        let imageFile = path.parse(file);
+        if (rename) {
+            // 文件重命名
+            newFileName = newName() + imageFile.ext;
+        } else {
+            // 仅仅更换目录
+            newFileName = imageFile.base;
+        }
+        let newFile = await getValidFileName(imageTargetFolder, newFileName);
+        if (newFile == '') {
+            logger.error(`get new image file name[${newFile}] fail!`);
+            return '';
+        }
+        logger.info(`[${file}] move to [${newFile}], ${count+1}/${len}`, false);
+        try{
+            fs.renameSync(file,newFile);
+            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
+            let a = convertAbOrRelative( newFile) ;
+            content =  content.replace(reg,'![$1]('+ 'images/'+ newFileName+')'); // 内容替换
+            count++;
+        }catch(e)
+        {
+            logger.error('move error:');
+            console.log(e);
+        }
+    }
+    await saveFileRenamed(docTextEditor,content,count);
+}
+
+
 
 export async function migrateFile(localFolder: string) {
 
@@ -603,15 +756,24 @@ function cleanInvalidLinks() {
         logger.error(e.message);
     }
 }
-export async function cleanWithSelectedLinks(imageTargetFolder:string,selectFlag:boolean= true) {
-    let cleanFlag = true;
+export async function cleanWithSelectedLinks(flag :string,selectFlag:boolean= true) {
+
+    let file = vscode.window.activeTextEditor?.document.uri.fsPath || '';
+    if (!mdCheck(file)) {
+        suspendedLogMsg();  //由于自动更新了一次url，刷新光标位置，躲避误触检测
+        return '';
+    }
     let fileObj = getImages(selectFlag); // 获取图片信息
     if (fileObj.content == '') {
+        logger.error(`No image  select to ${flag}.`);
         return '';
     }
     let fileArr = fileObj.local; // 本地文件上传
-    let fileMapping = fileObj.mapping; // 本地原始信息
     let content = fileObj.content;
+    if(flag == 'cut') {
+        copyFileObj = undefined;
+        cutFileObj = fileObj;
+    }
 
     //downThread = thread;
     // 对网络图片去重，不必每次下载
@@ -620,49 +782,96 @@ export async function cleanWithSelectedLinks(imageTargetFolder:string,selectFlag
     let uniArr: string[] = Array.from(set) as string[];
     let count = 0, len = uniArr.length;
     for (let file of uniArr) {
-        let newFileName = '';
-        // 转移到目标路径 
-        let imageFile = path.parse(file);
-        // if (rename) {
-        //     // 文件重命名
-        //     newFileName = newName() + imageFile.ext;
-        // } else {
-            // 仅仅更换目录
-            newFileName = imageFile.base;
-        // }
-        let newFile = await getValidFileName(imageTargetFolder, newFileName);
-        if (newFile == '') {
-            logger.error(`get new image file name[${newFile}] fail!`);
-            return '';
-        }
-        logger.info(`[${file}] move to [${newFile}], ${count+1}/${len}`, false);
+
+        logger.info(`Image ${flag} : [${file}] ], ${count+1}/${len}`,false);
         try{
-            fs.renameSync(file,newFile);
-            let b = escapeStringRegexp(fileMapping[file]);
-            var reg = new RegExp( '!\\[([^\\]]*)\\]\\('+ escapeStringRegexp(fileMapping[file]) +'\\)','ig');
-            let a = convertAbOrRelative( newFile) ;
             content =  ''; // 清空内容
             count++;
         }catch(e)
         {
-            logger.error('clean error:');
+            logger.error(`${flag} error`);
             console.log(e);
         }
     }
-    await saveFile(content,count,selectFlag,cleanFlag);
-    logger.success('Delete successfully.', true);
+    await saveFile(content,count,selectFlag,true);
+    logger.success(`${flag} successfully.`, true);
 
 }
-export async function vscDownload() {
-    await download()
-    suspendedLogMsg();
+
+export async function download(updateOrigin:boolean=false) // ,thread:number
+{
+    let fileObj ;
+    if (!localCheck()) {
+        return;
+    }
+    if(updateOrigin) {
+        await originFileProduce(true);   
+        fileObj = getRenamedImgs(docTextEditorAfterNewFile); // 获取新创建文件内信息
+    } else {
+        fileObj = getImages();
+    }
+    
+    if(fileObj == undefined) {
+        return ;
+    } 
+    let fileArr = fileObj.net;
+    let content = fileObj.content;
+    //downThread = thread;
+    // 对网络图片去重，不必每次下载
+    let set = new Set();
+    fileArr.forEach((item) => set.add(item));
+    let downArr: string[] = Array.from(set) as string[];
+    let count = 0, len = downArr.length;
+    let successCount = 0;
+
+    // 一直等着下载完毕，超时100秒
+    let rres:any;
+    var p = new Promise((resolve,reject) => {
+        rres = resolve;
+    });
+    logger.warn('Downloading images. Stay on this page.',true,true);
+    window.withProgress({ title: getLang('dling'), location: ProgressLocation.Notification }, async (progress, token) => {
+        for (let file of downArr) {
+            count++;
+            logger.info(`downloading [${file}], ${count}/${len}`, false);
+            let fileBasename = path.basename(file)
+            progress.report({ increment: 100/ len , message: getLang('dling2',fileBasename,count,len) });
+            try {
+                // 此处需要配置超时，不应该在外面超时
+                let res = await timeoutPromise(downloadCore(file, localFolder, rename), dlTimeout*1000 ,getLang('dltimeout',fileBasename,dlTimeout));
+                let resfile = res as string;
+                if (resfile == '') { continue; }
+                let newfile = getAutoPath(resfile);
+                // 适配图片的格式
+                var reg = new RegExp('!\\[([^\\]]*)\\]\\(' + escapeStringRegexp(file) + '\\)', 'ig');
+                let relativeNewFile = convertAbOrRelative(newfile);
+                content = content.replace(reg, '![$1](' + relativeNewFile + ')'); // 内容替换
+                successCount++;
+            } catch (e) {
+                console.log(e)
+                logger.error( getLang('dlerror', fileBasename) );
+                rres('error')
+                return Promise.reject()
+            }
+        }
+        if(updateOrigin) {
+            await saveFileRenamed(docTextEditorAfterNewFile,content, successCount);
+        } else {
+            await saveFile(content, successCount);
+        }
+        rres('finish')
+        return Promise.resolve()
+    });
+
+    return p;
 }
+
 
 
 
 export async function upCheck() {
     try {
-        logger.info(`start to init imagebed moudle , please wait.`, false,true);
+        // logger.info(`start to init imagebed moudle , please wait.`, false,true);
         const { PicGo } = require('picgo');
         myPicgo = PicGo;
     } catch (e) {
@@ -750,8 +959,9 @@ function getPicgoConfig():string | undefined {
      fs.writeFileSync(picgoConfigPath, JSON.stringify(picgoConfig, null, 4));
      return picgoConfigPath;
 }
-export async function upload(clipBoard: boolean = false) // ,thread:number
+export async function upload(clipBoard: boolean = false, select: boolean = false) // ,thread:number
 {
+    logger.info(`Uploading image, please stay focus and do not leave !`, true,true);
     let picgoConfigPath = getPicgoConfig();
     if(picgoConfigPath == undefined) {
         logger.info(`picgo config error ! please check.`, true,true);
@@ -772,23 +982,34 @@ export async function upload(clipBoard: boolean = false) // ,thread:number
         }
         // console.log(ctx.output) // [{ base64Image, fileName, width, height, extname }]
     });
+
+    let file = vscode.window.activeTextEditor?.document.uri.fsPath || '';
+    if (!mdCheck(file)) {
+        suspendedLogMsg();  //由于自动更新了一次url，刷新光标位置，躲避误触检测
+        return '';
+    }
     let fileMapping: Record<string, any>;
     let fileArr;
     let content = '';
-    if (clipBoard) {
-        fileArr = [''];
-    } else {
-        await saveCopiedMsg();
-        let fileObj = getRenamedImgs(docTextEditorAfterCopy); // 根据选择的内容上传
-        fileArr = fileObj.local; // 本地文件上传
-        fileMapping = fileObj.mapping; // 本地原始信息
-        content = fileObj.content;
-        if (fileArr.length == 0) {
-            logger.error(getLang('docSelect'))
-            return;
-        }
+    let fileObj;
+
+    if(select) {
+        fileObj = getImages(true);; // 根据选择的内容上传
+    }else {
+        await originFileProduce();
+        fileObj = getImages();; // 根据选择的内容上传
     }
-    logger.info(`Uploading image, please stay focus and do not leave !`, true,true);
+
+    
+    fileArr = fileObj.local; // 本地文件上传
+    fileMapping = fileObj.mapping; // 本地原始信息
+    content = fileObj.content;
+    if (fileArr.length == 0) {
+        logger.error(getLang('docSelect'))
+        return;
+    }
+
+
     
     //downThread = thread;
     // 对网络图片去重，不必每次下载
@@ -811,7 +1032,7 @@ export async function upload(clipBoard: boolean = false) // ,thread:number
             }
             logger.info(`uploading [${file}], ${count}/${len}`, false);
             let fileBasename = path.basename(file)
-            progress.report({ increment: count / len * 100, message: getLang('uping2', fileBasename , count, len) });
+            progress.report({ increment: 100 / len , message: getLang('uping2', fileBasename , count, len) });
             try {
                 let upList: string[] = [];
                 if (!clipBoard) {
@@ -857,8 +1078,13 @@ export async function upload(clipBoard: boolean = false) // ,thread:number
         if (clipBoard) {
             await insertText(content);
         } else {
-            await saveFileRenamed(content, successCount);
-            showStatus(docTextEditorAfterCopy);
+            await saveFile(content,successCount,select);
+                    // 保存当前标签页
+            let docTextEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
+            if(docTextEditor == null) { return; }
+            // await docTextEditor.document.save();
+
+            showStatus(docTextEditor);
 
             // if(!openAfterMigrate) {
             //     await   vscode.commands.executeCommand('workbench.action.closeActiveEditor'); // 关闭当前标签页
@@ -974,7 +1200,10 @@ export async function openAndEditMarkdownFile(mdTargetFilePath: string): Promise
     try {
         // 打开文件
         const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(mdTargetFilePath));
-        await vscode.window.showTextDocument(doc);
+        docTextEditorAfterNewFile = await vscode.window.showTextDocument(doc); // 显示文件
+        if(docTextEditorAfterNewFile == null) { return; }
+        await docTextEditorAfterNewFile.document.save();
+        
 
     } catch (error) {
         vscode.window.showErrorMessage(`Error opening file: ${error}`);
@@ -1004,7 +1233,11 @@ export function saveRenamedMsg(imageTargetFolder: string): boolean {
     return true;
 }
 
-export async function saveCopiedMsg() {
+
+export async function originFileProduce(update: boolean = false) {
+
+
+
     let mdOriginFile = getOriginMdPath();
     if (!mdOriginFile) {
         vscode.window.showErrorMessage('No file path found for the active document.');
@@ -1012,35 +1245,67 @@ export async function saveCopiedMsg() {
     }
     let mdOriginFileFolder = path.dirname(mdOriginFile);
     let mdOriginFileName = path.basename(mdOriginFile);
-    let mdFileNameAfterCopy = 'online_'+mdOriginFileName; // 内部对象赋值，多个模块共用
+    let mdFileNameAfterCopy = 'ori_'+mdOriginFileName; // 内部对象赋值，多个模块共用
     mdFileAfterCopy = path.join(mdOriginFileFolder, mdFileNameAfterCopy);
 
+
+    // 获取工作区的根路径
+    let rootPath: string ;
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (workspaceFolders) {
+        // 通常，我们取第一个工作区根路径作为当前文件所属的工作区
+        rootPath = workspaceFolders[0].uri.fsPath;
+        // 确保当前文件确实在工作区内
+        if (!mdOriginFile.startsWith(rootPath)) {
+            return '';
+        }
+    }else {
+        return '';
+    }
+    
+    // 构建 .recycle 目录路径
+    const recycleImgPath = path.join(rootPath, '.recycle/images'); // 假设 .recycle 在扩展的根目录下
+
+    // 检查 .recycle/images 文件夹是否存在，不存在则创建
+    if (update&&fs.existsSync(mdFileAfterCopy)) {
+        try {
+            // 打开新位置的文件
+            await   openAndEditMarkdownFile(mdFileAfterCopy);
+                        
+            await migrateRenamedImg(recycleImgPath,docTextEditorAfterNewFile);
+            console.log(`origin has been existed, drop to directory: ${recycleImgPath}`);
+            // await   openAndEditMarkdownFile(mdOriginFile);
+        } catch (error) {
+            console.error(`Failed to drop duplicate file: ${recycleImgPath}`, error);
+            vscode.window.showErrorMessage(`Failed to drop duplicate file: ${error}`);
+            return;
+        }
+    }
     try {
 
         fs.copyFileSync(mdOriginFile, mdFileAfterCopy) // 内部对象赋值，多个模块共用
-        let currentEditor = getMdEditor(); // 获取初始活动文本编辑器
-        if(currentEditor == null) { return ; }
+        if (docTextEditorAfterNewFile == undefined) {
+            return ;
+        }
+        // 延迟一小段时间以确保焦点正确设置
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await docTextEditorAfterNewFile.document.save();
+        await vscode.window.showTextDocument(docTextEditorAfterNewFile.document)
+        // 延迟一小段时间以确保焦点正确设置
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // let currentEditor = getMdEditor(); // 获取初始活动文本编辑器
+        // if(currentEditor == null) { return ; }
 
         // 如果当前活动编辑器是被移动的文件，则关闭它
   
-        await vscode.window.showTextDocument(currentEditor.document, currentEditor.viewColumn)
-        
-        await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+        // await vscode.window.showTextDocument(currentEditor.document, currentEditor.viewColumn)
+        if(update) {
+            // await   vscode.commands.executeCommand('workbench.action.closeActiveEditor')
     
-
-        // 打开新位置的文件
-        await   openAndEditMarkdownFile(mdFileAfterCopy);
-                    
-        // 保存当前标签页
-        docTextEditorAfterCopy = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
-        // docPreSelection_after_rename = docTextEditor_after_rename?.selection; // 光标位置
-
-        oMdFileAfterCopy = path.parse(mdFileAfterCopy)
-        if(docTextEditorAfterCopy == null) { return; }
-        await docTextEditorAfterCopy.document.save();
-
-
-
+            // 打开新位置的文件
+            // await   openAndEditMarkdownFile(mdFileAfterCopy);
+                        
+        }
 
     } catch (error) {
         // 类型保护
@@ -1053,7 +1318,7 @@ export async function saveCopiedMsg() {
 
 }
 
-export async function saveFileRenamed(content: string, count: number, selectFlag: boolean = false,cleanFlag: boolean = false) {
+export async function saveFileRenamed(textEditor:vscode.TextEditor | undefined,content: string, count: number, selectFlag: boolean = false,cleanFlag: boolean = false) {
     // if (count == 0) {
     //     logger.warn(getLang('uptSucc3'));
     //     return;
@@ -1063,7 +1328,6 @@ export async function saveFileRenamed(content: string, count: number, selectFlag
     //     return;
     // }
     // let textEditor = await checkEditor(false)
-    let textEditor = docTextEditorAfterCopy;
     if (textEditor == null) { return; }
     if ((content.length > 0||cleanFlag) && textEditor != null) {
         await textEditor.edit((editBuilder: vscode.TextEditorEdit) => {
@@ -1082,7 +1346,9 @@ export async function saveFileRenamed(content: string, count: number, selectFlag
             }
             editBuilder.replace(rang, content);
         });
+        await new Promise(resolve => setTimeout(resolve, 100));
         await textEditor.document.save();
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     logger.success(getLang('uptSucc', count, path.basename(mdFileAfterCopy)),false);
@@ -1190,7 +1456,6 @@ export async function convertSelectUrl(selectFlag:boolean= true){
         }
     }
     await saveFile(content,count,selectFlag);
-    let b;
 
 }
 

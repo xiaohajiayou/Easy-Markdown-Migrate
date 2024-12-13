@@ -4,11 +4,14 @@
     "easy-markdown-migrate.menuAnalyze": "Analyze Image Links",
     "easy-markdown-migrate.menuMigrate": "Migrate Markdown File",
     "easy-markdown-migrate.menuCopy": "Copy With Images",
+    "easy-markdown-migrate.menuCopyToClipboard": "Copy to clipboard",
     "easy-markdown-migrate.menuCut": "Cut With Images",
     "easy-markdown-migrate.menuPaste": "Paste With Images",
 
     "easy-markdown-migrate.menuDownload": "Download Images",
-    "easy-markdown-migrate.menuUpload": "Upload Images",
+    "easy-markdown-migrate.menuUploadRelease": "Upload and Release",
+    "easy-markdown-migrate.menuUploadModify": "Upload Select Url",
+    "easy-markdown-migrate.menuDownloadUpdateOrigin": "Update Origin File",
     "easy-markdown-migrate.menuMoveImage": " Move  Select Images",
     "easy-markdown-migrate.menuConvert": " Absolute<->Relative",
 

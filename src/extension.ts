@@ -1,15 +1,16 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import {initPara,vscDownload}  from './utils';
+import {initPara}  from './utils';
 import {vscAnalyze} from './analyze';
 import {vscDropFile} from './drop';
 import {vscMigrate} from './migrate';
 import {vscMove} from './moveImg';
 import {vscDeleteImgs} from './deleteImg';
-import { vscPaste,vscCut,vscCopy  } from './copyPaste';
+import { vscPaste,vscCut,vscCopy,vscCopyToClipboard  } from './copyPaste';
 import { vscConvertUrl } from './convertUrl';
-import { vscUpload } from './uploadImgs';
+import { vscUploadRelease,vscReleaseModify } from './uploadImgs';
+import { vscDownload,vscOriginUpdate} from './downloadImgs';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
@@ -46,6 +47,10 @@ export function activate(context: vscode.ExtensionContext) {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscCopy();
 	})
+	let dispCopyToClipboard = vscode.commands.registerCommand("easy-markdown-migrate.copyToClipboard", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscCopyToClipboard();
+	})
 	let dispCut = vscode.commands.registerCommand("easy-markdown-migrate.cut", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscCut();
@@ -56,13 +61,21 @@ export function activate(context: vscode.ExtensionContext) {
 	})
 
 
-	let dispDownload = vscode.commands.registerCommand("easy-markdown-migrate.download", async () => {
+	let dispDownload = vscode.commands.registerCommand("easy-markdown-migrate.downloadUpdateOrigin", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscOriginUpdate();
+	})
+	let dispUpdateOrigin = vscode.commands.registerCommand("easy-markdown-migrate.download", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
 		vscDownload();
 	})
-	let dispUpload = vscode.commands.registerCommand("easy-markdown-migrate.upload", async () => {
+	let dispUploadRelease = vscode.commands.registerCommand("easy-markdown-migrate.uploadRelease", async () => {
 		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
-		vscUpload();
+		vscUploadRelease();
+	})
+	let dispUploadModify = vscode.commands.registerCommand("easy-markdown-migrate.uploadModify", async () => {
+		if(!initPara()){return;} // 参数可能更新，重新从配置中获取初始化参数
+		vscReleaseModify();
 	})
 
 	let dispMove = vscode.commands.registerCommand("easy-markdown-migrate.moveImage", async () => {
@@ -88,11 +101,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(dispAnalyze);
 	context.subscriptions.push(dispMoveAll);
 	context.subscriptions.push(dispCopy);
+	context.subscriptions.push(dispCopyToClipboard);
 	context.subscriptions.push(dispCut);
 	context.subscriptions.push(dispPaste);
-
+	
 	context.subscriptions.push(dispDownload);
-	context.subscriptions.push(dispUpload);
+	context.subscriptions.push(dispUploadRelease);
+	context.subscriptions.push(dispUpdateOrigin);
+	context.subscriptions.push(dispUploadModify);
 
 	context.subscriptions.push(dispMove);
 	context.subscriptions.push(dispConvert);

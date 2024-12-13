@@ -35,6 +35,8 @@ export function getImages(selectFlag: boolean = false): { local: string[], net: 
  
     let editContent = '';
     const currentEditor = docTextEditor;
+    // const currentEditor = vscode.window.activeTextEditor; // 获取当前活动文本编辑器
+    
     if (currentEditor == null) {
         logger.error(getLang('docAct'))
         return retObj;
@@ -385,12 +387,14 @@ export async function saveFile(content: string, count: number, selectFlag: boole
             vscode.window.showTextDocument(textEditor.document)
             editBuilder.replace(rang, content);
         });
+        await new Promise(resolve => setTimeout(resolve, 100));
         await textEditor.document.save();
         await vscode.window.showTextDocument(textEditor.document)
+        await new Promise(resolve => setTimeout(resolve, 100));
         
     }
 
-    
+
     logger.success(getLang('uptSucc', count, path.basename(mdFile)),false);
 }
 // 获取本地有效的文件名

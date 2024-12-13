@@ -15,10 +15,13 @@
     "onCommand:easy-markdown-migrate.analyze",
     "onCommand:easy-markdown-migrate.migrate",
     "onCommand:easy-markdown-migrate.copy",
+    "onCommand:easy-markdown-migrate.copyToClipboard",
     "onCommand:easy-markdown-migrate.cut",
     "onCommand:easy-markdown-migrate.paste",
     "onCommand:easy-markdown-migrate.download",
-    "onCommand:easy-markdown-migrate.upload",
+    "onCommand:easy-markdown-migrate.downloadUpdateOrigin",
+    "onCommand:easy-markdown-migrate.uploadRelease",
+    "onCommand:easy-markdown-migrate.uploadModify",
     "onCommand:easy-markdown-migrate.moveImage",
     "onCommand:easy-markdown-migrate.convert",
     "onCommand:easy-markdown-migrate.deleteImage",
@@ -50,6 +53,10 @@
         "title": "%easy-markdown-migrate.menuCopy%"
       },
       {
+        "command": "easy-markdown-migrate.copyToClipboard",
+        "title": "%easy-markdown-migrate.menuCopyToClipboard%"
+      },
+      {
         "command": "easy-markdown-migrate.cut",
         "title": "%easy-markdown-migrate.menuCut%"
       },
@@ -62,8 +69,16 @@
         "title": "%easy-markdown-migrate.menuDownload%"
       },
       {
-        "command": "easy-markdown-migrate.upload",
-        "title": "%easy-markdown-migrate.menuUpload%"
+        "command": "easy-markdown-migrate.downloadUpdateOrigin",
+        "title": "%easy-markdown-migrate.menuDownloadUpdateOrigin%"
+      },
+      {
+        "command": "easy-markdown-migrate.uploadRelease",
+        "title": "%easy-markdown-migrate.menuUploadRelease%"
+      },
+      {
+        "command": "easy-markdown-migrate.uploadModify",
+        "title": "%easy-markdown-migrate.menuUploadModify%"
       },
       {
         "command": "easy-markdown-migrate.moveImage",
@@ -102,6 +117,12 @@
         "when": "editorTextFocus"
       },
       {
+        "command": "easy-markdown-migrate.copyToClipboard",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+alt+c",
+        "when": "editorTextFocus"
+      },
+      {
         "command": "easy-markdown-migrate.cut",
         "key": "ctrl+shift+x",
         "mac": "cmd+shift+x",
@@ -117,6 +138,30 @@
         "command": "easy-markdown-migrate.deleteImage",
         "key": "ctrl+shift+d",
         "mac": "cmd+shift+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "easy-markdown-migrate.download",
+        "key": "ctrl+alt+d",
+        "mac": "cmd+alt+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "easy-markdown-migrate.downloadUpdateOrigin",
+        "key": "ctrl+alt+u",
+        "mac": "cmd+alt+u",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "easy-markdown-migrate.uploadRelease",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "easy-markdown-migrate.uploadModify",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m",
         "when": "editorTextFocus"
       }
     ],
@@ -138,29 +183,43 @@
           "group": "1_workspace@2"
         },
         {
-          "command": "easy-markdown-migrate.copy",
+          "command": "easy-markdown-migrate.uploadRelease",
           "group": "2_workspace@1"
         },
         {
-          "command": "easy-markdown-migrate.cut",
+          "command": "easy-markdown-migrate.uploadModify",
           "group": "2_workspace@2"
         },
         {
-          "command": "easy-markdown-migrate.paste",
+          "command": "easy-markdown-migrate.downloadUpdateOrigin",
           "group": "2_workspace@3"
         },
         {
-          "command": "easy-markdown-migrate.deleteImage",
+          "command": "easy-markdown-migrate.download",
           "group": "2_workspace@4"
         },
         {
-          "command": "easy-markdown-migrate.upload",
+          "command": "easy-markdown-migrate.copyToClipboard",
           "group": "3_workspace@1"
         },
         {
-          "command": "easy-markdown-migrate.download",
+          "command": "easy-markdown-migrate.copy",
           "group": "3_workspace@2"
         },
+
+        {
+          "command": "easy-markdown-migrate.cut",
+          "group": "3_workspace@3"
+        },
+        {
+          "command": "easy-markdown-migrate.paste",
+          "group": "3_workspace@4"
+        },
+        {
+          "command": "easy-markdown-migrate.deleteImage",
+          "group": "3_workspace@5"
+        },
+        
         {
           "command": "easy-markdown-migrate.moveImage",
           "group": "4_workspace@1"
