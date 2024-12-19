@@ -8,7 +8,7 @@
 
 
 
-**Easy Markdown Migrate** is a plugin designed for `Markdown` file migration, achieving binding between files and the images behind their links, helping users to move, delete, copy, and paste files or content easily, making local management and image bed backup simpler.
+**Easy Markdown Migrate** is a plugin designed for `Markdown` file migration, achieving binding between files and the images behind their links, helping users to upload、download、move, delete, copy, and paste files or content easily, making local management and image bed backup simpler.
 
 
 Project Introduction
@@ -78,8 +78,8 @@ Function descriptions are as follows:
   - Copy images to clipboard: `Copy to clipboard`    
     - Shortcut key: `Ctrl` + `alt` + `C`  
 
-+ Publish final version of the document --> Upload images to image bed (automatically generate origin backup): `Upload and Release`    
-+ Update content of published document --> Upload partial images (automatically update image links): `Upload Select Url`  
++ Publish final version of the document --> Upload images to image bed (automatically generate origin backup): `Upload and Release`      
++ Update content of published document --> Upload partial images (only upload，no origin backup ): `Upload Select Url`    
 + Backup the latest published document's content --> Download all images (automatically update origin backup content): `Update Origin File`  
 - Select image links in the file to move images to another directory (automatically update links): `Move Select Images`  
 - Insert images from the local directory and convert to relative paths with one click: `Absolute<->Relative`    
@@ -113,5 +113,5 @@ This plugin aims to reduce the cost of writing documents and also make the proce
 Repository Address  
 ---------------
 
-https://github.com/xiaohajiayou/Easy-Markdown-Migrate     
-Welcome to
+https://github.com/xiaohajiayou/Easy-Markdown-Migrate      
+Welcome aboard! Feedback on issues and contributions are both greatly appreciated. If this plugin meets your needs, please give it a star . Thank you very much!    

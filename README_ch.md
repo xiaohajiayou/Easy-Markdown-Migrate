@@ -12,7 +12,7 @@
 
 
 
-**Easy Markdown Migrate** 是一个针对`Markdown`文件迁移而设计的插件，实现文件与链接背后的图片绑定，帮助用户轻松地移动、删除、复制、粘贴文件或内容，让本地管理和图床备份变得更简单。
+**Easy Markdown Migrate** 是一个针对`Markdown`文件迁移而设计的插件，实现文件与链接背后的图片绑定，帮助用户轻松地上传、下载、移动、删除、复制、粘贴文件或内容，让本地管理和图床备份变得更简单。
 
 
 项目简介
@@ -79,7 +79,7 @@
     - 快捷键：`Ctrl` + `alt` + `C`  
 
 + 发布最终版文档 --> 上传图片到图床（自动生成origin备份） ：`Upload and Release`    
-+ 更新发布文档的内容 --> 上传局部图片 （自动更新图片链接）：`Upload Select Url`  
++ 更新发布文档的内容 --> 上传局部图片 （仅上传，不生成origin备份）：`Upload Select Url`  
 + 备份最新发布文档的内容 --> 下载所以图片 （自动更新origin备份内容）：`Update Origin File`  
 - 选择文件内图片链接 --> 移动图片到另外的目录（自动更新链接） ：`Move Select Images`  
 - 插入本地目录下的图片 --> 一键转换为相对路径 ：`Absolute<->Relative`    

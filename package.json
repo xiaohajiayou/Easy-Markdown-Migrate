@@ -2,7 +2,7 @@
   "name": "easy-markdown-migrate",
   "displayName": "Easy Markdown Migrate",
   "description": "Migrate images along with Markdown files or pastes, ensuring links remain intact.",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "publisher": "HaCode",
   "icon": "icon.png",
   "engines": {
@@ -206,7 +206,6 @@
           "command": "easy-markdown-migrate.copy",
           "group": "3_workspace@2"
         },
-
         {
           "command": "easy-markdown-migrate.cut",
           "group": "3_workspace@3"
@@ -219,7 +218,6 @@
           "command": "easy-markdown-migrate.deleteImage",
           "group": "3_workspace@5"
         },
-        
         {
           "command": "easy-markdown-migrate.moveImage",
           "group": "4_workspace@1"
