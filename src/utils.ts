@@ -72,6 +72,60 @@ let myPicgo: any = null; // picgo对象
 let remote = ''; // 是否路径中不增加md文件名的文件夹，默认会自动增加文件夹以将不同md文件的图片分离开
 
 
+type MsgType = 'err' | 'warn' | 'info' | 'succ';
+export let logger = {
+    core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        // 核心模块显示
+        let color = '', hint = '', arr = [];
+        switch (msgType) {
+            case 'warn':
+                color = colorDict.yellow
+                hint = '[Warn]'
+                arr = msgHash.warn;
+                break;
+            case 'succ':
+                color = colorDict.green
+                arr = msgHash.info;
+                break;
+            case 'err':
+                color = colorDict.red
+                hint = '[Err]'
+                arr = msgHash.error;
+                break;
+            case 'info':
+                color = colorDict.cyan
+                arr = msgHash.info;
+                break;
+        }
+        // console.log(msg);
+        // console.log(color, msg, colorDict.reset);
+        out.appendLine(hint + msg);
+        if (popFlag) {
+            if (immediately) {
+                vscode.window.showWarningMessage(msg);
+            } else {
+                arr.push(msg.toString());
+            }
+        }
+    },
+    warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.yellow(...msg))
+        this.core('warn', msg, popFlag, immediately);
+    },
+    success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.green(...msg))
+        this.core('succ', msg, popFlag, immediately);
+        
+    },
+    error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.red(...msg))
+        this.core('err', msg, popFlag, immediately);
+    },
+    info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
+        //console.log( chalk.blue(...msg))
+        this.core('info', msg, popFlag, immediately);
+    }
+};
 
 
 export async function copyContent(selectFlag:boolean= true) {
@@ -415,60 +469,6 @@ export function showStatus(docTextEditor: vscode.TextEditor| undefined) {
     }
 }
 
-type MsgType = 'err' | 'warn' | 'info' | 'succ';
-export let logger = {
-    core: function (msgType: MsgType, msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        // 核心模块显示
-        let color = '', hint = '', arr = [];
-        switch (msgType) {
-            case 'warn':
-                color = colorDict.yellow
-                hint = '[Warn]'
-                arr = msgHash.warn;
-                break;
-            case 'succ':
-                color = colorDict.green
-                arr = msgHash.info;
-                break;
-            case 'err':
-                color = colorDict.red
-                hint = '[Err]'
-                arr = msgHash.error;
-                break;
-            case 'info':
-                color = colorDict.cyan
-                arr = msgHash.info;
-                break;
-        }
-        // console.log(msg);
-        // console.log(color, msg, colorDict.reset);
-        out.appendLine(hint + msg);
-        if (popFlag) {
-            if (immediately) {
-                vscode.window.showWarningMessage(msg);
-            } else {
-                arr.push(msg.toString());
-            }
-        }
-    },
-    warn: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.yellow(...msg))
-        this.core('warn', msg, popFlag, immediately);
-    },
-    success: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.green(...msg))
-        this.core('succ', msg, popFlag, immediately);
-        
-    },
-    error: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.red(...msg))
-        this.core('err', msg, popFlag, immediately);
-    },
-    info: function (msg: string, popFlag: boolean = true, immediately: boolean = false) {
-        //console.log( chalk.blue(...msg))
-        this.core('info', msg, popFlag, immediately);
-    }
-};
 
 export async function moveImg(lf:string,selectFlag:boolean= true) // ,thread:number
 {

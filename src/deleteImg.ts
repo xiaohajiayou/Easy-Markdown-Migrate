@@ -1,8 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
-import { getLang } from './lib/lang';
-import {initPara,suspendedLogMsg,getOriginMdPath,migrateImg,cleanWithSelectedLinks,moveImg} from './utils'
+import {suspendedLogMsg,getOriginMdPath,cleanWithSelectedLinks,moveImg} from './utils'
 
 export async function vscDeleteImgs(flag:boolean=false) {
     let mdOriginFilePath = getOriginMdPath();

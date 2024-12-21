@@ -1,7 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
-import { getLang } from './lib/lang';
 import {getOriginMdPath,moveImg,upload,upCheck,suspendedLogMsg,logger} from './utils'
 
 

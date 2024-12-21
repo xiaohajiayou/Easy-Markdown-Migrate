@@ -1,5 +1,3 @@
-import * as fs from 'fs'
-import * as path from 'path'
 import * as vscode from 'vscode';
 import { getLang } from './lib/lang';
 import { suspendedLogMsg,moveImg ,analyze} from './utils';

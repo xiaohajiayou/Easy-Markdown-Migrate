@@ -1,8 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode';
-import { getLang } from './lib/lang';
-import {copyContentToClipboard,initPara,copyContent,cutContent,pasteContent,analyze,suspendedLogMsg,getOriginMdPath,moveImg,cleanWithSelectedLinks} from './utils'
+import {copyContentToClipboard,copyContent,pasteContent,analyze,suspendedLogMsg,getOriginMdPath,moveImg,cleanWithSelectedLinks} from './utils'
 
 
 export async function vscCopy() {
