@@ -8,17 +8,21 @@
 
 
 
-**Easy Markdown Migrate** is a plugin designed for `Markdown` file migration, achieving binding between files and the images behind their links, helping users to upload、download、move, delete, copy, and paste files or content easily, making local management and image bed backup simpler.
+**Easy Markdown Migrate** is a plugin designed for `Markdown `file migration, binding files with their linked images, and assisting users in local management and image bed backup (easily `uploading, downloading, moving, deleting, copying, and pasting` images and text), making document writing and note organization simpler.  
 
 
 Project Introduction
 ---------------
-
-With this plugin, users only need to focus on writing documents. The plugin will automatically recognize the image links in the files and match them with the underlying images, achieving quick classification and movement of files and images. You simply need to use the shortcut keys for `Migrate Markdown File` or `Copy With Images`, `Paste With Images`, `Copy to clipboard`, to move files and images to the desired location, greatly improving document management efficiency.
-
-In addition, Easy Markdown Migrate also provides functions such as image bed upload and image download. You only need to use shortcut keys for `Upload and Release` or `Upload Select Url`, `Update Origin File`, `Download Images`, to publish the current document (automatically upload, update links, generate origin backup), partial upload (upload selected images, update links), and backup update (download all images of the published version, update origin backup links). These operations can help developers publish local files as blog posts; they can also achieve network image backup. All these operations automatically maintain the relationship between images and files, ensuring the correctness of image links.
-
-Our goal is to make `Markdown` document management not only efficient but also more beginner-friendly. Even beginners who have never used `Markdown` can put all files and images in the root directory and then use Easy Markdown Migrate to achieve reliable migration management.
+Imagine needing to move a document or a piece of content (including image links) from its current path. Do the images migrate with the document/content? Are the image links still `valid`? 
+*   Currently, to solve this migration issue, images are often automatically uploaded to an image bed (including unused images). As resources accumulate, it becomes increasingly difficult to distinguish and separate them.
+    
+*   Image beds have capacity `limits and are unstable`, so they should only be used for backing up final versions, allowing for easy switching between image bed services. Before that, local management is necessary.
+    
+*   This plugin `matches image links in files with their underlying images`, enabling reliable migration management for documents, such as quick categorization, `movement, deletion, copying, and pasting`, all `locally`.
+    
+*   Users can simply `publish` and `back up` the final version with one click through the menu or shortcuts, turning local files into `blogs/documents` and completing image bed and local backups.
+    
+*   File management is `entirely local`, with the image bed only saving the final published version, saving image bed resources and making backups easy.
 
 
 Main Features  
@@ -32,10 +36,10 @@ Main Features
   5. When you need to delete specified content (including `image URLs`), it supports one-click `deletion` of content and moves affiliated images to the `.recycle/images` folder.     
 
 
-- **Image Bed Migration**:  
-  1. When you need to publish a specified file as a blog post, it supports one-click publishing, uploading images to the image bed, where `url` is replaced with the image bed link, and generates an `origin` version of the local file.
-  2. When you need to update published content, it supports one-click partial upload, uploading selected images to the image bed, and automatically updating links     
-  2. When you need to back up network resources, it supports one-click update backup, backing up the latest published content, automatically downloading all image resources, keeping resource management local.     
++ **Image Bed Migration (only updates local backup for final versions)**:  
+  1. When publishing a specified file as a blog, it supports one-click uploading of all images to the image bed (replacing links) and generating a same-name local backup (with the prefix "origin").
+  2. When updating published content, it supports one-click partial uploading, only uploading selected images to the image bed (replacing links) without updating the local backup.
+  3. After completing the update of the published document, it supports one-click updating of the local backup (discarding the previously managed local resources and automatically downloading the latest resources).
 
 
 - **Image Management**:  
@@ -65,7 +69,7 @@ Function descriptions are as follows:
 - Move the current file and images to another directory (automatically update image links): `Migrate Markdown File`  
   - Shortcut key: `Ctrl` + `Shift` + `M`  
 
-![alt text](https://s2.loli.net/2024/12/09/P9XEhwRUTyn1biJ.gif)           
+        
 - Copy/cut selected content (including images) in the current file to another directory's file:  
   - Copy selected content: `Copy With Images`    
     - Shortcut key: `Ctrl` + `Shift` + `C`   
@@ -85,7 +89,7 @@ Function descriptions are as follows:
 - Insert images from the local directory and convert to relative paths with one click: `Absolute<->Relative`    
 + Delete the current file to discard files and images to the trash (automatically update links): `Drop File to Trash`    
 
-
+![alt text](https://s2.loli.net/2024/12/09/P9XEhwRUTyn1biJ.gif)   
 For specific usage methods and detailed usage cases, please refer to the plugin usage document:  
 - [Github](https://github.com/xiaohajiayou/Easy-Markdown-Migrate/wiki)     
 - [Gitee](https://gitee.com/lilhah/easy-markdown-migrate/wikis/Home)     
